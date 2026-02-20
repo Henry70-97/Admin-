@@ -1,2563 +1,493 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
- <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Creativepay - Creative Writing Earning Platform</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.css">
-  <style>
-    body {
-      box-sizing: border-box;
-    }
-    
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-    
-    * {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-    
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-    
-    .app-wrapper {
-      width: 100%;
-      min-height: 100%;
-      overflow-x: hidden;
-      overflow-y: auto;
-    }
-    
-    .gradient-bg {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    }
-    
-    .gradient-green-pink {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-    
-    .gradient-teal-purple {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    }
-    
-    .gradient-pink-orange {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-    
-    .gradient-purple-blue {
-      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-    }
-    
-    .floating-shape {
-      position: absolute;
-      border-radius: 50%;
-      opacity: 0.1;
-      animation: float 20s infinite ease-in-out;
-    }
-    
-    @keyframes float {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-30px) rotate(180deg); }
-    }
-    
-    .card-hover {
-      transition: all 0.3s ease;
-    }
-    
-    .card-hover:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    }
-    
-    .slide-menu {
-      position: fixed;
-      top: 0;
-      left: -100%;
-      width: 280px;
-      height: 100%;
-      background: white;
-      box-shadow: 2px 0 20px rgba(0,0,0,0.1);
-      transition: left 0.3s ease;
-      z-index: 1000;
-      overflow-y: auto;
-    }
-    
-    .slide-menu.active {
-      left: 0;
-    }
-    
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      z-index: 999;
-    }
-    
-    .overlay.active {
-      display: block;
-    }
-    
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 2000;
-      overflow-y: auto;
-      padding: 20px;
-    }
-    
-    .modal.active {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .modal-content {
-      background: white;
-      border-radius: 20px;
-      max-width: 500px;
-      width: 100%;
-      max-height: 90vh;
-      overflow-y: auto;
-      animation: slideUp 0.3s ease;
-    }
-    
-    @keyframes slideUp {
-      from { transform: translateY(50px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    
-    .pdf-viewer {
-      background: white;
-      padding: 40px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.2);
-      max-width: 800px;
-      margin: 0 auto;
-    }
-    
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #10b981;
-      color: white;
-      padding: 16px 24px;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-      display: none;
-      z-index: 3000;
-      animation: slideIn 0.3s ease;
-    }
-    
-    @keyframes slideIn {
-      from { transform: translateX(400px); }
-      to { transform: translateX(0); }
-    }
-    
-    .toast.active {
-      display: block;
-    }
-    
-    .balance-card {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 24px;
-      padding: 32px;
-      color: white;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .balance-card::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-      animation: pulse 4s infinite;
-    }
-    
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 0.5; }
-      50% { transform: scale(1.1); opacity: 0.8; }
-    }
-    
-    input, textarea, select {
-      transition: all 0.3s ease;
-    }
-    
-    input:focus, textarea:focus, select:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-  </style>
-  <style>@view-transition { navigation: auto; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
- </head>
- <body>
-  <div class="app-wrapper" style="background: #fefcfb;"><!-- Floating Shapes -->
-   <div class="floating-shape" style="width: 300px; height: 300px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); top: 10%; left: -10%;"></div>
-   <div class="floating-shape" style="width: 200px; height: 200px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); top: 50%; right: -5%; animation-delay: -5s;"></div>
-   <div class="floating-shape" style="width: 250px; height: 250px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); bottom: 10%; left: 10%; animation-delay: -10s;"></div><!-- Overlay -->
-   <div class="overlay" id="overlay"></div><!-- Slide Menu -->
-   <div class="slide-menu" id="slideMenu">
-    <div class="p-6 gradient-bg">
-     <div class="flex items-center justify-between">
-      <div>
-       <h3 class="text-white font-bold text-xl">Menu</h3>
-       <p class="text-white text-sm opacity-80" id="menuUserEmail">user@example.com</p>
-      </div><button onclick="toggleMenu()" class="text-white text-2xl"> <i class="fas fa-times"></i> </button>
-     </div>
-    </div>
-    <div class="p-4"><a href="#" onclick="showDashboard(); toggleMenu();" class="flex items-center p-4 rounded-xl hover:bg-purple-50 transition mb-2"> <i class="fas fa-home text-purple-600 text-xl w-8"></i> <span class="font-medium">Home</span> </a> <a href="#" onclick="showTasks('short-story'); toggleMenu();" class="flex items-center p-4 rounded-xl hover:bg-blue-50 transition mb-2"> <i class="fas fa-book text-blue-600 text-xl w-8"></i> <span class="font-medium">Short Story Tasks</span> </a> <a href="#" onclick="showTasks('essay'); toggleMenu();" class="flex items-center p-4 rounded-xl hover:bg-green-50 transition mb-2"> <i class="fas fa-pen-fancy text-green-600 text-xl w-8"></i> <span class="font-medium">Essay Tasks</span> </a> <a href="#" onclick="showSubmitTask(); toggleMenu();" class="flex items-center p-4 rounded-xl hover:bg-pink-50 transition mb-2"> <i class="fas fa-upload text-pink-600 text-xl w-8"></i> <span class="font-medium">Submit Task</span> </a> <a href="#" onclick="showEarnings(); toggleMenu();" class="flex items-center p-4 rounded-xl hover:bg-yellow-50 transition mb-2"> <i class="fas fa-chart-line text-yellow-600 text-xl w-8"></i> <span class="font-medium">Earnings</span> </a> <a href="#" onclick="showWithdraw(); toggleMenu();" class="flex items-center p-4 rounded-xl hover:bg-teal-50 transition mb-2"> <i class="fas fa-money-bill-wave text-teal-600 text-xl w-8"></i> <span class="font-medium">Withdraw</span> </a> <a href="#" onclick="showSubscription(); toggleMenu();" class="flex items-center p-4 rounded-xl hover:bg-purple-50 transition mb-2"> <i class="fas fa-crown text-purple-600 text-xl w-8"></i> <span class="font-medium">Subscribe - Unlimited Tasks</span> </a> <a href="https://chat.whatsapp.com/BB9RnEv8b5E9AuOafdAac6?mode=gi_t" target="_blank" rel="noopener noreferrer" class="flex items-center p-4 rounded-xl hover:bg-indigo-50 transition mb-2"> <i class="fab fa-whatsapp text-indigo-600 text-xl w-8"></i> <span class="font-medium">Meet Other Writers</span> </a> <a href="#" onclick="showSupport(); toggleMenu();" class="flex items-center p-4 rounded-xl hover:bg-orange-50 transition mb-2"> <i class="fas fa-headset text-orange-600 text-xl w-8"></i> <span class="font-medium">Support</span> </a> <a href="#" onclick="showRefund(); toggleMenu();" class="flex items-center p-4 rounded-xl hover:bg-red-50 transition mb-2"> <i class="fas fa-undo text-red-600 text-xl w-8"></i> <span class="font-medium">Refund</span> </a> <a href="#" onclick="logout(); toggleMenu();" class="flex items-center p-4 rounded-xl hover:bg-gray-100 transition"> <i class="fas fa-sign-out-alt text-gray-600 text-xl w-8"></i> <span class="font-medium">Logout</span> </a>
-    </div>
-   </div><!-- Toast Notification -->
-   <div class="toast" id="toast">
-    <div class="flex items-center"><i class="fas fa-check-circle mr-3 text-xl"></i> <span id="toastMessage">Success!</span>
-    </div>
-   </div><!-- Main Content -->
-   <div id="mainContent"></div>
-  </div>
-  <script>
-    // Initialize localStorage
-    if (!localStorage.getItem('creativepay_user')) {
-      localStorage.setItem('creativepay_user', JSON.stringify({
-        email: '',
-        password: '',
-        fullName: '',
-        phone: '',
-        country: 'Kenya',
-        paymentMethod: '',
-        paymentDetails: '',
-        totalEarnings: 0,
-        welcomeBonus: 0,
-        currency: 'USD',
-        activities: [],
-        submittedTasks: [],
-        approvedTasks: [],
-        activeTask: null,
-        isSubscribed: false,
-        tasksCompletedThisMonth: 0,
-        taskStatuses: {}
-      }));
-    }
-
-    let currentPage = 'landing';
-    let userData = JSON.parse(localStorage.getItem('creativepay_user'));
-    
-    // Helper function to get task status
-    function getTaskStatus(taskId) {
-      userData = JSON.parse(localStorage.getItem('creativepay_user'));
-      return userData.taskStatuses[taskId] || null;
-    }
-    
-    // Helper function to set task status
-    function setTaskStatus(taskId, status) {
-      userData = JSON.parse(localStorage.getItem('creativepay_user'));
-      userData.taskStatuses[taskId] = {
-        status: status,
-        updatedAt: new Date().toLocaleString()
-      };
-      localStorage.setItem('creativepay_user', JSON.stringify(userData));
-    }
-    
-    // Status badge helper
-    function getStatusBadge(status) {
-      if (!status) return '';
-      
-      const badges = {
-        'in_progress': '<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold"><i class="fas fa-spinner mr-1"></i>In Progress</span>',
-        'submitted': '<span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-bold"><i class="fas fa-clock mr-1"></i>Pending Review</span>',
-        'approved': '<span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold"><i class="fas fa-check mr-1"></i>Completed</span>',
-        'paid_partially': '<span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-bold"><i class="fas fa-coins mr-1"></i>Paid Partially</span>',
-        'paid_full': '<span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold"><i class="fas fa-money-bill-wave mr-1"></i>Paid in Full</span>'
-      };
-      
-      return badges[status.status] || '';
-    }
-    
-    // Task data
-    const shortStoryTasks = [
-      { id: 1, title: "The Lost Heritage", client: "Literary Kenya", genre: "Historical Fiction", words: 1000, pages: 4, payment: 2000, description: "Write a compelling short story about a young Kenyan discovering their family's forgotten history during the Mau Mau uprising. Focus on themes of identity, heritage, and reconciliation." },
-      { id: 2, title: "Nairobi Nights", client: "Urban Stories Ltd", genre: "Contemporary", words: 750, pages: 3, payment: 1500, description: "Craft a modern tale set in Nairobi's bustling nightlife, exploring the contrast between tradition and modernity through two characters from different generations." },
-      { id: 3, title: "The River's Secret", client: "Nature Tales", genre: "Mystery", words: 1250, pages: 5, payment: 2500, description: "Create a mysterious story about a village along the Tana River where ancient secrets are revealed during a drought. Incorporate Kenyan folklore." },
-      { id: 4, title: "Hustler's Dream", client: "Everyday Kenya", genre: "Drama", words: 500, pages: 2, payment: 1000, description: "Tell the story of a matatu conductor with bigger dreams. Show the daily struggles and small victories that define life in Kenya's informal sector." },
-      { id: 5, title: "The Coffee Farm", client: "Rural Narratives", genre: "Family Drama", words: 1500, pages: 6, payment: 3000, description: "Write about three generations on a family coffee farm in Central Kenya, dealing with changing times, land issues, and family bonds." },
-      { id: 6, title: "Safari Encounter", client: "Wildlife Stories", genre: "Adventure", words: 1000, pages: 4, payment: 2000, description: "An unexpected encounter during a Maasai Mara safari changes a tourist's perspective on conservation and community." },
-      { id: 7, title: "The Fisherman's Daughter", client: "Coastal Tales", genre: "Coming of Age", words: 750, pages: 3, payment: 1500, description: "A young girl in Lamu dreams of becoming a marine biologist while her family expects her to follow traditional roles." },
-      { id: 8, title: "Digital Revolution", client: "Tech Kenya", genre: "Sci-Fi", words: 1250, pages: 5, payment: 2500, description: "Set in 2040 Nairobi, explore how technology has transformed Kenyan society through the eyes of a young innovator." },
-      { id: 9, title: "The Last Dance", client: "Cultural Heritage", genre: "Romance", words: 500, pages: 2, payment: 1000, description: "Two dancers from rival traditional dance groups fall in love during a national cultural festival." },
-      { id: 10, title: "Maize Season", client: "Agricultural Stories", genre: "Slice of Life", words: 1000, pages: 4, payment: 2000, description: "Capture the rhythm of rural life during harvest season in the Rift Valley, showing community, hard work, and celebration." },
-      { id: 11, title: "The Activist", client: "Social Justice", genre: "Political Drama", words: 1500, pages: 6, payment: 3000, description: "Follow a young environmental activist fighting against illegal logging in the Aberdare forests." },
-      { id: 12, title: "Chapati Chronicles", client: "Food Stories", genre: "Humor", words: 750, pages: 3, payment: 1500, description: "A humorous tale about a family's Sunday chapati-making tradition and the chaos that ensues when the recipe goes missing." },
-      { id: 13, title: "The Healer", client: "Spiritual Tales", genre: "Magical Realism", words: 1000, pages: 4, payment: 2000, description: "A traditional healer in modern Kenya navigates between two worlds - ancient wisdom and contemporary skepticism." },
-      { id: 14, title: "Comrades Forever", client: "Campus Life", genre: "Comedy", words: 500, pages: 2, payment: 1000, description: "University students navigate friendships, relationships, and the infamous 'comrades' lifestyle in a Kenyan campus." },
-      { id: 15, title: "The Marathon", client: "Sports Narratives", genre: "Inspirational", words: 1250, pages: 5, payment: 2500, description: "From rural beginnings to international recognition - tell the story of a young runner's journey to greatness." },
-      { id: 16, title: "Shamba Boy", client: "Labor Stories", genre: "Social Commentary", words: 1000, pages: 4, payment: 2000, description: "Explore the life and dreams of a farm worker, highlighting issues of dignity, fair wages, and social justice." },
-      { id: 17, title: "The Widow's Strength", client: "Women's Stories", genre: "Drama", words: 1500, pages: 6, payment: 3000, description: "A widow defies cultural expectations to build a successful business and secure her children's future." },
-      { id: 18, title: "Matatu Chronicles", client: "Urban Transport", genre: "Anthology", words: 750, pages: 3, payment: 1500, description: "Weave together multiple passengers' stories during one eventful matatu journey through Nairobi." },
-      { id: 19, title: "The Tea Pickers", client: "Rural Voice", genre: "Social Drama", words: 1000, pages: 4, payment: 2000, description: "Tell the story of tea plantation workers in Kericho, their dreams, struggles, and the bonds formed over shared experiences." },
-      { id: 20, title: "Kwani Trust Stories", client: "Literary Magazine", genre: "Experimental", words: 1250, pages: 5, payment: 2500, description: "Create an innovative narrative that plays with form and structure, exploring urban Kenyan identity through fragmented perspectives." },
-      { id: 21, title: "The Boda Boda Man", client: "City Stories", genre: "Thriller", words: 750, pages: 3, payment: 1500, description: "A motorcycle taxi driver witnesses a crime and must decide whether to speak up or stay silent in this fast-paced urban thriller." },
-      { id: 22, title: "Grandmother's Tales", client: "Heritage Publishers", genre: "Folklore", words: 500, pages: 2, payment: 1000, description: "Reimagine a traditional Kenyan folktale for modern audiences while preserving its cultural wisdom and moral lessons." },
-      { id: 23, title: "The Election", client: "Political Narratives", genre: "Political Fiction", words: 1500, pages: 6, payment: 3000, description: "Explore the tensions, hopes, and complexities surrounding a local election in a rural constituency through multiple viewpoints." },
-      { id: 24, title: "Street Children", client: "Social Impact Stories", genre: "Drama", words: 1000, pages: 4, payment: 2000, description: "Write a sensitive and hopeful story about street children in Nairobi, focusing on resilience, friendship, and dreams of a better future." },
-      { id: 25, title: "The Music Producer", client: "Arts Kenya", genre: "Contemporary", words: 750, pages: 3, payment: 1500, description: "Follow a young music producer navigating the challenges of the Kenyan entertainment industry while staying true to their artistic vision." }
-    ];
-
-    const essayTasks = [
-      { id: 101, topic: "Things Fall Apart by Chinua Achebe", author: "Chinua Achebe", client: "African Literature Review", words: 1000, pages: 4, payment: 2000, question: "Analyze how Achebe uses Igbo proverbs and oral tradition to challenge colonial narratives. Discuss the significance of language and storytelling in preserving African identity." },
-      { id: 102, topic: "Weep Not, Child by Ngugi wa Thiong'o", author: "Ngugi wa Thiong'o", client: "Postcolonial Studies", words: 1250, pages: 5, payment: 2500, question: "Examine the impact of colonialism on Kenyan society through Njoroge's educational journey. How does Ngugi portray the tension between traditional values and Western education?" },
-      { id: 103, topic: "Half of a Yellow Sun by Chimamanda Ngozi Adichie", author: "Chimamanda Ngozi Adichie", client: "Contemporary African Lit", words: 1500, pages: 6, payment: 3000, question: "Discuss how Adichie interweaves personal narratives with historical events of the Biafran War. Analyze the role of gender and class in the novel." },
-      { id: 104, topic: "The River Between by Ngugi wa Thiong'o", author: "Ngugi wa Thiong'o", client: "Cultural Identity", words: 750, pages: 3, payment: 1500, question: "Explore the conflict between tradition and modernity through the characters of Waiyaki and Joshua. How does the river function as a symbol?" },
-      { id: 105, topic: "Nervous Conditions by Tsitsi Dangarembga", author: "Tsitsi Dangarembga", client: "Feminist Perspectives", words: 1000, pages: 4, payment: 2000, question: "Analyze how Dangarembga presents the intersection of colonialism and patriarchy in Rhodesia through Tambu's narrative voice." },
-      { id: 106, topic: "The Beautyful Ones Are Not Yet Born by Ayi Kwei Armah", author: "Ayi Kwei Armah", client: "Political Literature", words: 1250, pages: 5, payment: 2500, question: "Examine Armah's use of imagery and symbolism to critique post-independence corruption in Ghana. Discuss the protagonist's moral struggle." },
-      { id: 107, topic: "Petals of Blood by Ngugi wa Thiong'o", author: "Ngugi wa Thiong'o", client: "Socialist Critique", words: 1500, pages: 6, payment: 3000, question: "Analyze Ngugi's critique of neo-colonialism and capitalism in post-independence Kenya. How does the novel address class struggle?" },
-      { id: 108, topic: "Purple Hibiscus by Chimamanda Ngozi Adichie", author: "Chimamanda Ngozi Adichie", client: "Family Dynamics", words: 500, pages: 2, payment: 1000, question: "Discuss how Adichie explores religious extremism and domestic violence through Kambili's coming-of-age story." },
-      { id: 109, topic: "Devil on the Cross by Ngugi wa Thiong'o", author: "Ngugi wa Thiong'o", client: "Economic Justice", words: 1000, pages: 4, payment: 2000, question: "Examine how Ngugi uses satire and allegory to critique neo-colonialism and the comprador bourgeoisie in Kenya." },
-      { id: 110, topic: "So Long a Letter by Mariama Bâ", author: "Mariama Bâ", client: "Women's Studies", words: 750, pages: 3, payment: 1500, question: "Analyze how Bâ addresses polygamy, women's education, and female friendship in Senegalese society through Ramatoulaye's letter." },
-      { id: 111, topic: "Wizard of the Crow by Ngugi wa Thiong'o", author: "Ngugi wa Thiong'o", client: "Magical Realism", words: 1250, pages: 5, payment: 2500, question: "Discuss Ngugi's use of magical realism to satirize dictatorship and corruption in post-colonial Africa." },
-      { id: 112, topic: "The Joys of Motherhood by Buchi Emecheta", author: "Buchi Emecheta", client: "Motherhood Studies", words: 1000, pages: 4, payment: 2000, question: "Critically examine Emecheta's ironic title and her portrayal of motherhood and female agency in colonial Nigeria." },
-      { id: 113, topic: "Americanah by Chimamanda Ngozi Adichie", author: "Chimamanda Ngozi Adichie", client: "Diaspora Studies", words: 1500, pages: 6, payment: 3000, question: "Analyze how Adichie explores race, identity, and belonging through Ifemelu's experiences in America and return to Nigeria." },
-      { id: 114, topic: "A Grain of Wheat by Ngugi wa Thiong'o", author: "Ngugi wa Thiong'o", client: "Independence Studies", words: 1250, pages: 5, payment: 2500, question: "Examine how Ngugi deconstructs heroism and explores betrayal during Kenya's struggle for independence." },
-      { id: 115, topic: "The Concubine by Elechi Amadi", author: "Elechi Amadi", client: "Traditional Beliefs", words: 750, pages: 3, payment: 1500, question: "Discuss how Amadi portrays the influence of traditional African spirituality and the supernatural in Ihuoma's tragic story." },
-      { id: 116, topic: "Mine Boy by Peter Abrahams", author: "Peter Abrahams", client: "Urban Studies", words: 1000, pages: 4, payment: 2000, question: "Analyze how Abrahams depicts the dehumanizing effects of apartheid and industrialization in South African mines." },
-      { id: 117, topic: "The Beautiful Ones by Grace Ogot", author: "Grace Ogot", client: "Kenyan Women Writers", words: 500, pages: 2, payment: 1000, question: "Examine how Ogot blends folklore with contemporary issues to address women's roles in Kenyan society." },
-      { id: 118, topic: "Season of Migration to the North by Tayeb Salih", author: "Tayeb Salih", client: "Postcolonial Theory", words: 1250, pages: 5, payment: 2500, question: "Discuss Salih's exploration of cultural clash, identity crisis, and the psychological impact of colonialism." },
-      { id: 119, topic: "No Longer at Ease by Chinua Achebe", author: "Chinua Achebe", client: "Modern Africa Studies", words: 1000, pages: 4, payment: 2000, question: "Examine how Achebe portrays the conflict between traditional expectations and modern urban life through Obi's moral dilemma." },
-      { id: 120, topic: "The Trial of Dedan Kimathi by Ngugi wa Thiong'o", author: "Ngugi wa Thiong'o & Micere Mugo", client: "Revolutionary Theatre", words: 750, pages: 3, payment: 1500, question: "Analyze how the play reimagines Kenyan history and challenges colonial narratives through dramatic techniques and symbolism." },
-      { id: 121, topic: "Tsotsi by Athol Fugard", author: "Athol Fugard", client: "Crime Literature", words: 1250, pages: 5, payment: 2500, question: "Discuss themes of redemption and humanity in apartheid South Africa through Tsotsi's transformation." },
-      { id: 122, topic: "Arrow of God by Chinua Achebe", author: "Chinua Achebe", client: "Cultural Conflict", words: 1500, pages: 6, payment: 3000, question: "Explore how Achebe uses Ezeulu's story to examine the clash between traditional authority and colonial power." },
-      { id: 123, topic: "The Man Died by Wole Soyinka", author: "Wole Soyinka", client: "Political Memoir", words: 1000, pages: 4, payment: 2000, question: "Analyze Soyinka's documentation of political imprisonment and his critique of military dictatorship in Nigeria." },
-      { id: 124, topic: "Matigari by Ngugi wa Thiong'o", author: "Ngugi wa Thiong'o", client: "Political Allegory", words: 1250, pages: 5, payment: 2500, question: "Examine how Ngugi uses allegorical storytelling to critique post-independence betrayal and the struggle for justice." },
-      { id: 125, topic: "We Need New Names by NoViolet Bulawayo", author: "NoViolet Bulawayo", client: "Migration Studies", words: 750, pages: 3, payment: 1500, question: "Discuss how Bulawayo portrays childhood in Zimbabwe and the immigrant experience in America through Darling's narrative." }
-    ];
-
-    // Initialize app
-    function init() {
-      showLanding();
-    }
-
-    function showLanding() {
-      currentPage = 'landing';
-      const content = `
-        <div class="min-h-screen flex flex-col">
-          <!-- Header -->
-          <header class="relative z-10 px-6 py-4 flex items-center justify-between">
-            <div class="flex items-center">
-              <div class="w-10 h-10 gradient-bg rounded-xl flex items-center justify-center">
-                <i class="fas fa-pen-nib text-white text-xl"></i>
-              </div>
-              <h1 class="ml-3 text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Creativepay</h1>
-            </div>
-            <button onclick="showLogin()" class="px-6 py-2 bg-white rounded-xl shadow-md hover:shadow-lg transition font-medium">
-              Login
-            </button>
-          </header>
-
-          <!-- Hero Section -->
-          <div class="flex-1 flex items-center justify-center px-6 py-12">
-            <div class="max-w-2xl text-center relative z-10">
-              <h2 class="text-5xl font-bold mb-6 leading-tight">
-                <span class="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-                  Earn Money Writing
-                </span>
-                <br>
-                <span class="text-gray-800">Creative Stories</span>
-              </h2>
-              <p class="text-xl text-gray-600 mb-8">
-                Join Kenya's premier creative writing platform. Get paid for short stories and essay writing focused on Kenyan and African literature.
-              </p>
-              <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button onclick="showRegistration()" class="px-8 py-4 gradient-bg text-white rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105">
-                  Get Started
-                  <i class="fas fa-arrow-right ml-2"></i>
-                </button>
-                <button onclick="showLogin()" class="px-8 py-4 bg-white text-purple-600 rounded-2xl font-semibold text-lg shadow-lg hover:shadow-xl transition">
-                  Sign In
-                </button>
-              </div>
-              
-              <!-- Features -->
-              <div class="grid sm:grid-cols-3 gap-6 mt-16">
-                <div class="bg-white p-6 rounded-2xl shadow-lg">
-                  <div class="w-12 h-12 gradient-green-pink rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-dollar-sign text-white text-2xl"></i>
-                  </div>
-                  <h3 class="font-bold text-lg mb-2">Earn Daily</h3>
-                  <p class="text-gray-600 text-sm">KSh 500 per page for quality writing</p>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-lg">
-                  <div class="w-12 h-12 gradient-teal-purple rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-tasks text-white text-2xl"></i>
-                  </div>
-                  <h3 class="font-bold text-lg mb-2">Multiple Tasks</h3>
-                  <p class="text-gray-600 text-sm">25+ tasks in each category daily</p>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-lg">
-                  <div class="w-12 h-12 gradient-pink-orange rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-wallet text-white text-2xl"></i>
-                  </div>
-                  <h3 class="font-bold text-lg mb-2">Fast Payments</h3>
-                  <p class="text-gray-600 text-sm">Withdraw anytime in USD or KES</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Footer -->
-          <footer class="relative z-10 px-6 py-8 border-t border-gray-200">
-            <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-              <div class="flex gap-6">
-                <a href="#" class="text-gray-600 hover:text-purple-600 transition">Terms</a>
-                <a href="#" class="text-gray-600 hover:text-purple-600 transition">Privacy</a>
-                <a href="#" onclick="showSupport(); event.preventDefault();" class="text-gray-600 hover:text-purple-600 transition">Contact</a>
-              </div>
-              <div class="flex gap-4">
-                <a href="https://chat.whatsapp.com/BB9RnEv8b5E9AuOafdAac6?mode=gi_t" target="_blank" rel="noopener noreferrer" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-purple-100 transition">
-                  <i class="fab fa-whatsapp text-gray-600"></i>
-                </a>
-                <a href="#" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-purple-100 transition">
-                  <i class="fab fa-twitter text-gray-600"></i>
-                </a>
-                <a href="#" class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-purple-100 transition">
-                  <i class="fab fa-instagram text-gray-600"></i>
-                </a>
-              </div>
-            </div>
-          </footer>
-        </div>
-      `;
-      document.getElementById('mainContent').innerHTML = content;
-    }
-
-    function showLogin() {
-      currentPage = 'login';
-      const content = `
-        <div class="min-h-screen flex items-center justify-center px-6 py-12">
-          <div class="max-w-md w-full">
-            <div class="text-center mb-8">
-              <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-pen-nib text-white text-3xl"></i>
-              </div>
-              <h2 class="text-3xl font-bold mb-2">Welcome Back</h2>
-              <p class="text-gray-600">Sign in to continue earning</p>
-            </div>
-            
-            <div class="bg-white rounded-3xl shadow-xl p-8">
-              <form onsubmit="handleLogin(event)" id="loginForm">
-                <div class="mb-6">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <input type="email" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="your@email.com">
-                </div>
-                
-                <div class="mb-6">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                  <input type="password" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="••••••••">
-                </div>
-                
-                <button type="submit" class="w-full py-4 gradient-bg text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105">
-                  Sign In
-                </button>
-              </form>
-              
-              <div class="mt-6 text-center">
-                <p class="text-gray-600">Don't have an account? 
-                  <a href="#" onclick="showRegistration(); event.preventDefault();" class="text-purple-600 font-medium hover:text-purple-700">Sign up</a>
-                </p>
-              </div>
-            </div>
-            
-            <button onclick="showLanding()" class="mt-6 w-full py-3 bg-white rounded-xl shadow-md hover:shadow-lg transition font-medium">
-              <i class="fas fa-arrow-left mr-2"></i> Back to Home
-            </button>
-          </div>
-        </div>
-      `;
-      document.getElementById('mainContent').innerHTML = content;
-    }
-
-    function handleLogin(e) {
-      e.preventDefault();
-      const form = e.target;
-      const email = form[0].value;
-      const password = form[1].value;
-      
-      if (userData.email === email && userData.password === password) {
-        showToast('Login successful!');
-        setTimeout(() => showDashboard(), 1000);
-      } else {
-        showToast('Invalid credentials. Please try again.', 'error');
-      }
-    }
-
-    function showRegistration() {
-      currentPage = 'registration';
-      const content = `
-        <div class="min-h-screen flex items-center justify-center px-6 py-12">
-          <div class="max-w-md w-full">
-            <div class="text-center mb-8">
-              <div class="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-user-plus text-white text-3xl"></i>
-              </div>
-              <h2 class="text-3xl font-bold mb-2">Create Account</h2>
-              <p class="text-gray-600">Join the creative community</p>
-            </div>
-            
-            <div class="bg-white rounded-3xl shadow-xl p-8">
-              <form onsubmit="handleRegistration(event)" id="registrationForm">
-                <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                  <input type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="John Doe">
-                </div>
-                
-                <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                  <input type="email" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="john@example.com">
-                </div>
-                
-                <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                  <input type="password" required minlength="6" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="••••••••">
-                </div>
-                
-                <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-                  <input type="tel" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="+254 700 000 000">
-                </div>
-                
-                <div class="mb-6">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Country</label>
-                  <select required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500">
-                    <option value="Kenya">Kenya</option>
-                    <option value="Uganda">Uganda</option>
-                    <option value="Tanzania">Tanzania</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-                
-                <button type="submit" class="w-full py-4 gradient-bg text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105">
-                  Create Account
-                </button>
-              </form>
-              
-              <div class="mt-6 text-center">
-                <p class="text-gray-600">Already have an account? 
-                  <a href="#" onclick="showLogin(); event.preventDefault();" class="text-purple-600 font-medium hover:text-purple-700">Sign in</a>
-                </p>
-              </div>
-            </div>
-            
-            <button onclick="showLanding()" class="mt-6 w-full py-3 bg-white rounded-xl shadow-md hover:shadow-lg transition font-medium">
-              <i class="fas fa-arrow-left mr-2"></i> Back to Home
-            </button>
-          </div>
-        </div>
-      `;
-      document.getElementById('mainContent').innerHTML = content;
-    }
-
-    async function handleRegistration(e) {
-      e.preventDefault();
-      const form = e.target;
-      
-      const registrationData = {
-        fullName: form[0].value,
-        email: form[1].value,
-        password: form[2].value,
-        phone: form[3].value,
-        country: form[4].value
-      };
-      
-      // Send to Web3Forms
-      await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          access_key: '4d568274-521b-452a-a113-62eed5ad915b',
-          subject: 'New Registration - Creativepay',
-          ...registrationData
-        })
-      });
-      
-      showToast('Registration submitted!');
-      setTimeout(() => showDeclaration(registrationData), 1000);
-    }
-
-    function showDeclaration(regData) {
-      currentPage = 'declaration';
-      const content = `
-        <div class="min-h-screen flex items-center justify-center px-6 py-12">
-          <div class="max-w-2xl w-full">
-            <div class="text-center mb-8">
-              <div class="w-16 h-16 gradient-teal-purple rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-file-signature text-white text-3xl"></i>
-              </div>
-              <h2 class="text-3xl font-bold mb-2">Writer's Declaration</h2>
-              <p class="text-gray-600">Please read and accept our terms</p>
-            </div>
-            
-            <div class="bg-white rounded-3xl shadow-xl p-8">
-              <div class="mb-6 p-6 bg-purple-50 rounded-2xl max-h-96 overflow-y-auto">
-                <h3 class="font-bold text-lg mb-4">Terms & Conditions</h3>
-                <ul class="space-y-3 text-gray-700">
-                  <li class="flex items-start">
-                    <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
-                    <span>I declare that all work submitted will be original and plagiarism-free</span>
-                  </li>
-                  <li class="flex items-start">
-                    <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
-                    <span>I understand that payment is KSh 500 per page (250 words)</span>
-                  </li>
-                  <li class="flex items-start">
-                    <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
-                    <span>I agree to maintain professional standards in all submissions</span>
-                  </li>
-                  <li class="flex items-start">
-                    <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
-                    <span>I accept that tasks must be completed within the given timeframe</span>
-                  </li>
-                  <li class="flex items-start">
-                    <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
-                    <span>I understand that rejected work will not be compensated</span>
-                  </li>
-                  <li class="flex items-start">
-                    <i class="fas fa-check text-green-500 mt-1 mr-3"></i>
-                    <span>I agree to receive a welcome bonus between $0.10 - $5.00 upon completing payment setup</span>
-                  </li>
-                </ul>
-              </div>
-              
-              <form onsubmit="handleDeclaration(event)" id="declarationForm">
-                <div class="mb-6">
-                  <label class="flex items-center">
-                    <input type="checkbox" required class="w-5 h-5 text-purple-600 rounded">
-                    <span class="ml-3 text-gray-700">I have read and agree to the terms and conditions</span>
-                  </label>
-                </div>
-                
-                <button type="submit" class="w-full py-4 gradient-bg text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105">
-                  Continue to Payment Setup
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      `;
-      document.getElementById('mainContent').innerHTML = content;
-    }
-
-    function handleDeclaration(e) {
-      e.preventDefault();
-      showPaymentSetup();
-    }
-
-    function showPaymentSetup() {
-      currentPage = 'payment';
-      const content = `
-        <div class="min-h-screen flex items-center justify-center px-6 py-12">
-          <div class="max-w-md w-full">
-            <div class="text-center mb-8">
-              <div class="w-16 h-16 gradient-pink-orange rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-credit-card text-white text-3xl"></i>
-              </div>
-              <h2 class="text-3xl font-bold mb-2">Payment Setup</h2>
-              <p class="text-gray-600">Choose your payment method</p>
-            </div>
-            
-            <div class="bg-white rounded-3xl shadow-xl p-8">
-              <form onsubmit="handlePaymentSetup(event)" id="paymentForm">
-                <div class="mb-6">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
-                  <select required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" onchange="updatePaymentFields(this.value)">
-                    <option value="">Select method</option>
-                    <option value="mpesa">M-Pesa</option>
-                    <option value="paypal">PayPal</option>
-                    <option value="bank">Bank Account</option>
-                  </select>
-                </div>
-                
-                <div id="paymentDetails"></div>
-                
-                <div class="mb-6 p-4 bg-green-50 rounded-xl">
-                  <div class="flex items-center text-green-700">
-                    <i class="fas fa-gift text-2xl mr-3"></i>
-                    <div>
-                      <p class="font-bold">Welcome Bonus</p>
-                      <p class="text-sm">Receive $0.10 - $5.00 after completing setup!</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <button type="submit" class="w-full py-4 gradient-bg text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105">
-                  Complete Setup & Get Bonus
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      `;
-      document.getElementById('mainContent').innerHTML = content;
-    }
-
-    function updatePaymentFields(method) {
-      const detailsDiv = document.getElementById('paymentDetails');
-      let html = '';
-      
-      if (method === 'mpesa') {
-        html = `
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">M-Pesa Number</label>
-            <input type="tel" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="+254 700 000 000">
-          </div>
-        `;
-      } else if (method === 'paypal') {
-        html = `
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">PayPal Email</label>
-            <input type="email" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="your@paypal.com">
-          </div>
-        `;
-      } else if (method === 'bank') {
-        html = `
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Bank Name</label>
-            <input type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="Bank name">
-          </div>
-          <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Account Number</label>
-            <input type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="Account number">
-          </div>
-          <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Account Name</label>
-            <input type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="Full name">
-          </div>
-        `;
-      }
-      
-      detailsDiv.innerHTML = html;
-    }
-
-    async function handlePaymentSetup(e) {
-      e.preventDefault();
-      const form = e.target;
-      const method = form[0].value;
-      let details = '';
-      
-      if (method === 'mpesa') {
-        details = form[1].value;
-      } else if (method === 'paypal') {
-        details = form[1].value;
-      } else if (method === 'bank') {
-        details = `${form[1].value} - ${form[2].value} - ${form[3].value}`;
-      }
-      
-      userData.paymentMethod = method;
-      userData.paymentDetails = details;
-      userData.welcomeBonus = 0.05;
-      userData.totalEarnings = 0.05;
-      userData.activities.push({
-        type: 'bonus',
-        description: 'Welcome Bonus',
-        amount: 0.05,
-        time: new Date().toLocaleString()
-      });
-      
-      localStorage.setItem('creativepay_user', JSON.stringify(userData));
-      
-      // Send to Web3Forms
-      await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          access_key: '4d568274-521b-452a-a113-62eed5ad915b',
-          subject: 'Payment Setup - Creativepay',
-          email: userData.email,
-          paymentMethod: method,
-          paymentDetails: details
-        })
-      });
-      
-      showToast('Setup complete! Welcome bonus added!');
-      setTimeout(() => showDashboard(), 1500);
-    }
-
-    function showDashboard() {
-      currentPage = 'dashboard';
-      userData = JSON.parse(localStorage.getItem('creativepay_user'));
-      
-      const usdAmount = userData.totalEarnings.toFixed(2);
-      const kesAmount = (userData.totalEarnings * 130).toFixed(2);
-      const displayAmount = userData.currency === 'USD' ? `$${usdAmount}` : `KES ${kesAmount}`;
-      
-      const recentActivities = userData.activities.slice(-5).reverse();
-      
-      const content = `
-        <div class="min-h-screen pb-20">
-          <!-- Header -->
-          <header class="gradient-bg px-6 py-6 relative overflow-hidden">
-            <div class="relative z-10">
-              <div class="flex items-center justify-between mb-6">
-                <button onclick="toggleMenu()" class="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center text-white">
-                  <i class="fas fa-bars text-xl"></i>
-                </button>
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center text-white">
-                    <i class="fas fa-bell"></i>
-                  </div>
-                  <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center">
-                    <i class="fas fa-user text-purple-600"></i>
-                  </div>
-                </div>
-              </div>
-              
-              <h1 class="text-white text-2xl font-bold mb-1">Welcome back!</h1>
-              <p class="text-white text-opacity-80">${userData.fullName || 'Writer'}</p>
-            </div>
-          </header>
-
-          <!-- Balance Card -->
-          <div class="px-6 -mt-12 relative z-20 mb-6">
-            <div class="balance-card">
-              <div class="relative z-10">
-                <div class="flex items-center justify-between mb-4">
-                  <p class="text-white text-opacity-80 text-sm">Total Earnings</p>
-                  <button onclick="toggleCurrency()" class="px-3 py-1 bg-white bg-opacity-20 rounded-lg text-white text-sm font-medium">
-                    ${userData.currency}
-                    <i class="fas fa-exchange-alt ml-1"></i>
-                  </button>
-                </div>
-                
-                <h2 class="text-white text-5xl font-bold mb-6">${displayAmount}</h2>
-                
-                <div class="flex gap-3">
-                  <button onclick="showTasks('short-story')" class="flex-1 py-3 bg-white text-purple-600 rounded-xl font-semibold shadow-lg hover:shadow-xl transition">
-                    <i class="fas fa-pen mr-2"></i>
-                    Start Writing
-                  </button>
-                  <button onclick="showWithdraw()" class="flex-1 py-3 bg-white bg-opacity-20 text-white rounded-xl font-semibold hover:bg-opacity-30 transition">
-                    <i class="fas fa-arrow-up mr-2"></i>
-                    Withdraw
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quick Actions -->
-          <div class="px-6 mb-6">
-            <div class="grid grid-cols-2 gap-4">
-              <button onclick="showTasks('short-story')" class="bg-white p-4 rounded-2xl shadow-md hover:shadow-lg transition card-hover">
-                <div class="w-12 h-12 gradient-green-pink rounded-xl flex items-center justify-center mb-3">
-                  <i class="fas fa-book text-white text-xl"></i>
-                </div>
-                <p class="font-semibold text-gray-800">Short Stories</p>
-                <p class="text-sm text-gray-500">25 tasks</p>
-              </button>
-              
-              <button onclick="showTasks('essay')" class="bg-white p-4 rounded-2xl shadow-md hover:shadow-lg transition card-hover">
-                <div class="w-12 h-12 gradient-teal-purple rounded-xl flex items-center justify-center mb-3">
-                  <i class="fas fa-pen-fancy text-white text-xl"></i>
-                </div>
-                <p class="font-semibold text-gray-800">Essays</p>
-                <p class="text-sm text-gray-500">25 tasks</p>
-              </button>
-            </div>
-          </div>
-
-          <!-- Recent Activity -->
-          <div class="px-6 mb-6">
-            <div class="flex items-center justify-between mb-4">
-              <h3 class="text-xl font-bold">Recent Activity</h3>
-              <button onclick="showEarnings()" class="text-purple-600 text-sm font-medium">
-                View All <i class="fas fa-arrow-right ml-1"></i>
-              </button>
-            </div>
-            
-            <div class="bg-white rounded-2xl shadow-md p-4 space-y-3">
-              ${recentActivities.length > 0 ? recentActivities.map((activity, index) => `
-                <div class="flex items-center justify-between p-3 rounded-xl ${index % 2 === 0 ? 'bg-purple-50' : 'bg-blue-50'}">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 ${activity.type === 'bonus' ? 'bg-green-100' : activity.type === 'approved' ? 'bg-blue-100' : activity.type === 'withdrawal' ? 'bg-orange-100' : 'bg-purple-100'} rounded-xl flex items-center justify-center">
-                      <i class="fas ${activity.type === 'bonus' ? 'fa-gift text-green-600' : activity.type === 'approved' ? 'fa-check text-blue-600' : activity.type === 'withdrawal' ? 'fa-arrow-up text-orange-600' : 'fa-upload text-purple-600'}"></i>
-                    </div>
-                    <div>
-                      <p class="font-medium text-gray-800">${activity.description}</p>
-                      <p class="text-xs text-gray-500">${activity.time}</p>
-                    </div>
-                  </div>
-                  <p class="font-bold ${activity.amount > 0 ? 'text-green-600' : 'text-orange-600'}">${activity.amount > 0 ? '+' : ''}$${Math.abs(activity.amount).toFixed(2)}</p>
-                </div>
-              `).join('') : '<p class="text-center text-gray-500 py-4">No activities yet</p>'}
-            </div>
-          </div>
-        </div>
-      `;
-      document.getElementById('mainContent').innerHTML = content;
-    }
-
-    function toggleCurrency() {
-      userData.currency = userData.currency === 'USD' ? 'KES' : 'USD';
-      localStorage.setItem('creativepay_user', JSON.stringify(userData));
-      showDashboard();
-    }
-
-    function showTasks(category) {
-      currentPage = `tasks-${category}`;
-      const tasks = category === 'short-story' ? shortStoryTasks : essayTasks;
-      const title = category === 'short-story' ? 'Short Story Tasks' : 'Essay Writing Tasks';
-      const icon = category === 'short-story' ? 'fa-book' : 'fa-pen-fancy';
-      
-      const content = `
-        <div class="min-h-screen pb-20">
-          <!-- Header -->
-          <header class="gradient-bg px-6 py-6">
-            <div class="flex items-center gap-4">
-              <button onclick="showDashboard()" class="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center text-white">
-                <i class="fas fa-arrow-left"></i>
-              </button>
-              <div>
-                <h1 class="text-white text-2xl font-bold">${title}</h1>
-                <p class="text-white text-opacity-80">${tasks.length} available tasks</p>
-              </div>
-            </div>
-          </header>
-
-          <!-- Tasks Grid -->
-          <div class="px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            ${tasks.map((task, index) => {
-              const taskStatus = getTaskStatus(task.id);
-              return `
-              <div class="bg-white rounded-2xl shadow-md p-5 card-hover ${index % 4 === 0 ? 'bg-gradient-to-br from-purple-50 to-white' : index % 4 === 1 ? 'bg-gradient-to-br from-blue-50 to-white' : index % 4 === 2 ? 'bg-gradient-to-br from-pink-50 to-white' : 'bg-gradient-to-br from-green-50 to-white'}">
-                <div class="flex items-start justify-between mb-3">
-                  <div class="flex-1">
-                    <div class="flex items-center gap-2 mb-2 flex-wrap">
-                      <h3 class="font-bold text-lg text-gray-800">${category === 'short-story' ? task.title : task.topic}</h3>
-                      ${getStatusBadge(taskStatus)}
-                    </div>
-                    ${category === 'essay' ? `<p class="text-sm text-gray-600 mb-2">Author: ${task.author}</p>` : ''}
-                    <div class="flex items-center gap-2 flex-wrap">
-                      <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
-                        ${task.client}
-                      </span>
-                      ${category === 'short-story' ? `
-                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
-                          ${task.genre}
-                        </span>
-                      ` : ''}
-                    </div>
-                  </div>
-                  <div class="w-12 h-12 ${index % 4 === 0 ? 'gradient-green-pink' : index % 4 === 1 ? 'gradient-teal-purple' : index % 4 === 2 ? 'gradient-pink-orange' : 'gradient-purple-blue'} rounded-xl flex items-center justify-center flex-shrink-0">
-                    <i class="fas ${icon} text-white"></i>
-                  </div>
-                </div>
-                
-                <div class="border-t border-gray-200 pt-3 mb-3">
-                  <div class="grid grid-cols-2 gap-3 mb-3">
-                    <div>
-                      <p class="text-xs text-gray-500">Word Count</p>
-                      <p class="font-semibold text-gray-800">${task.words} words</p>
-                    </div>
-                    <div>
-                      <p class="text-xs text-gray-500">Payment</p>
-                      <p class="font-bold text-green-600">KES ${task.payment}</p>
-                    </div>
-                  </div>
-                  <p class="text-sm text-gray-600 line-clamp-2">${category === 'short-story' ? task.description : task.question}</p>
-                </div>
-                
-                <div class="flex gap-2">
-                  <button onclick='viewTaskDetails(${JSON.stringify(task).replace(/'/g, "&apos;")}, "${category}")' class="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition">
-                    <i class="fas fa-eye mr-2"></i>
-                    View Details
-                  </button>
-                  <button onclick='acceptTask(${JSON.stringify(task)}, "${category}")' class="flex-1 py-3 gradient-bg text-white rounded-xl font-semibold hover:shadow-lg transition" ${taskStatus ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
-                    <i class="fas fa-check mr-2"></i>
-                    ${taskStatus ? 'Accepted' : 'Accept'}
-                  </button>
-                </div>
-              </div>
-            `}).join('')}
-          </div>
-        </div>
-      `;
-      document.getElementById('mainContent').innerHTML = content;
-    }
-
-    function viewTaskDetails(task, category) {
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      modal.innerHTML = `
-        <div class="modal-content" style="max-width: 900px;">
-          <div class="pdf-viewer">
-            <!-- Header -->
-            <div class="flex items-center justify-between mb-6 pb-4 border-b-2 border-purple-600">
-              <div class="flex items-center gap-3">
-                <div class="w-16 h-16 gradient-bg rounded-xl flex items-center justify-center">
-                  <i class="fas fa-pen-nib text-white text-2xl"></i>
-                </div>
-                <div>
-                  <h1 class="text-2xl font-bold text-purple-600">Creativepay</h1>
-                  <p class="text-sm text-gray-600">Creative Writing Platform</p>
-                </div>
-              </div>
-              <button onclick="this.closest('.modal').remove()" class="w-10 h-10 bg-gray-100 rounded-full hover:bg-gray-200 transition">
-                <i class="fas fa-times text-gray-600"></i>
-              </button>
-            </div>
-
-            <!-- Task Details -->
-            <div class="mb-6">
-              <div class="bg-purple-50 p-4 rounded-xl mb-4">
-                <h2 class="text-xl font-bold text-gray-800 mb-2">${category === 'short-story' ? task.title : task.topic}</h2>
-                <div class="flex flex-wrap gap-2">
-                  <span class="px-3 py-1 bg-white rounded-full text-sm font-medium text-purple-600">
-                    Task ID: #${task.id}
-                  </span>
-                  <span class="px-3 py-1 bg-white rounded-full text-sm font-medium text-blue-600">
-                    ${task.client}
-                  </span>
-                  ${category === 'short-story' ? `
-                    <span class="px-3 py-1 bg-white rounded-full text-sm font-medium text-green-600">
-                      ${task.genre}
-                    </span>
-                  ` : `
-                    <span class="px-3 py-1 bg-white rounded-full text-sm font-medium text-green-600">
-                      ${task.author}
-                    </span>
-                  `}
-                </div>
-              </div>
-
-              <div class="grid grid-cols-3 gap-4 mb-6">
-                <div class="bg-green-50 p-4 rounded-xl">
-                  <p class="text-sm text-gray-600 mb-1">Word Count</p>
-                  <p class="text-2xl font-bold text-gray-800">${task.words}</p>
-                </div>
-                <div class="bg-blue-50 p-4 rounded-xl">
-                  <p class="text-sm text-gray-600 mb-1">Pages</p>
-                  <p class="text-2xl font-bold text-gray-800">${task.pages}</p>
-                </div>
-                <div class="bg-purple-50 p-4 rounded-xl">
-                  <p class="text-sm text-gray-600 mb-1">Payment</p>
-                  <p class="text-2xl font-bold text-green-600">KES ${task.payment}</p>
-                </div>
-              </div>
-
-              <div class="bg-gray-50 p-6 rounded-xl mb-6">
-                <h3 class="font-bold text-lg mb-3">${category === 'short-story' ? 'Story Description' : 'Essay Question'}</h3>
-                <p class="text-gray-700 leading-relaxed">${category === 'short-story' ? task.description : task.question}</p>
-              </div>
-
-              <div class="bg-yellow-50 p-4 rounded-xl border-l-4 border-yellow-500 mb-6">
-                <div class="flex items-start gap-3">
-                  <i class="fas fa-info-circle text-yellow-600 text-xl mt-1"></i>
-                  <div>
-                    <h4 class="font-bold text-gray-800 mb-1">Important Guidelines</h4>
-                    <ul class="text-sm text-gray-700 space-y-1">
-                      <li>• All work must be original and plagiarism-free</li>
-                      <li>• Submit within 48 hours of acceptance</li>
-                      <li>• Payment processed after approval (2-3 business days)</li>
-                      <li>• Follow the exact word count requirement</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex gap-4 pt-4 border-t-2 border-gray-200">
-              <button onclick="downloadTaskPDF(${JSON.stringify(task).replace(/'/g, '&apos;')}, '${category}')" class="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition">
-                <i class="fas fa-download mr-2"></i>
-                Download PDF
-              </button>
-              <button onclick='acceptTask(${JSON.stringify(task)}, "${category}")' class="flex-1 py-3 gradient-bg text-white rounded-xl font-semibold hover:shadow-lg transition">
-                <i class="fas fa-check mr-2"></i>
-                Accept Task
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-    }
-
-    function downloadTaskPDF(task, category) {
-      const content = `
-        Task Details - Creativepay
-        ========================
-        
-        ${category === 'short-story' ? 'Short Story Task' : 'Essay Writing Task'}
-        
-        Title: ${category === 'short-story' ? task.title : task.topic}
-        ${category === 'essay' ? `Author: ${task.author}` : ''}
-        Client: ${task.client}
-        ${category === 'short-story' ? `Genre: ${task.genre}` : ''}
-        
-        Requirements:
-        - Word Count: ${task.words} words
-        - Pages: ${task.pages}
-        - Payment: KES ${task.payment}
-        
-        ${category === 'short-story' ? 'Description' : 'Question'}:
-        ${category === 'short-story' ? task.description : task.question}
-        
-        Guidelines:
-        - All work must be original and plagiarism-free
-        - Submit within 48 hours of acceptance
-        - Payment processed after approval (2-3 business days)
-        - Follow the exact word count requirement
-        
-        ---
-        Creativepay - Creative Writing Earning Platform
-      `;
-      
-      const blob = new Blob([content], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `Task_${task.id}_${category === 'short-story' ? task.title : task.topic}.txt`;
-      a.click();
-      URL.revokeObjectURL(url);
-      
-      showToast('Task details downloaded!');
-    }
-
-    function acceptTask(task, category) {
-      // Reload user data to ensure fresh state
-      userData = JSON.parse(localStorage.getItem('creativepay_user'));
-      
-      // Check if task already accepted
-      const taskStatus = getTaskStatus(task.id);
-      if (taskStatus) {
-        showToast('Task already accepted!', 'error');
-        return;
-      }
-      
-      // Check if user already has an active task
-      if (userData.activeTask) {
-        showToast('Please complete your current task first!', 'error');
-        return;
-      }
-      
-      // Check subscription status and task limits
-      if (!userData.isSubscribed && userData.tasksCompletedThisMonth >= 1) {
-        showToast('Free task limit reached! Subscribe for 4 more tasks.', 'error');
-        if (document.querySelector('.modal')) {
-          document.querySelector('.modal').remove();
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster Pro - Earn Money by Completing Tasks</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .hero {
+            background: var(--gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+            margin-top: 0;
+            color: white;
         }
-        setTimeout(() => showSubscription(), 1000);
-        return;
-      }
-      
-      // Check if subscribed user has reached their limit (1 free + 4 premium = 5 total)
-      if (userData.isSubscribed && userData.tasksCompletedThisMonth >= 5) {
-        showToast('Task limit reached! You have completed all 5 tasks available.', 'error');
-        if (document.querySelector('.modal')) {
-          document.querySelector('.modal').remove();
+
+        .hero-content {
+            flex: 1;
+            animation: fadeIn 1s ease;
         }
-        return;
-      }
-      
-      // Store the accepted task with ALL necessary fields
-      userData.activeTask = {
-        id: task.id,
-        title: category === 'short-story' ? task.title : task.topic,
-        topic: category === 'essay' ? task.topic : task.title,
-        client: task.client,
-        genre: task.genre || '',
-        author: task.author || '',
-        words: task.words,
-        pages: task.pages,
-        payment: task.payment,
-        description: task.description || task.question,
-        question: task.question || task.description,
-        category: category,
-        acceptedAt: new Date().toLocaleString()
-      };
-      
-      // Set task status to "in_progress"
-      setTaskStatus(task.id, 'in_progress');
-      
-      localStorage.setItem('creativepay_user', JSON.stringify(userData));
-      
-      showToast('Task accepted! Start writing and submit when ready.');
-      if (document.querySelector('.modal')) {
-        document.querySelector('.modal').remove();
-      }
-      setTimeout(() => showSubmitTask(), 1000);
-    }
 
-    function showSubmitTask() {
-      currentPage = 'submit';
-      userData = JSON.parse(localStorage.getItem('creativepay_user'));
-      
-      const activeTask = userData.activeTask;
-      
-      if (!activeTask) {
-        const content = `
-          <div class="min-h-screen pb-20">
-            <!-- Header -->
-            <header class="gradient-bg px-6 py-6">
-              <div class="flex items-center gap-4">
-                <button onclick="showDashboard()" class="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center text-white">
-                  <i class="fas fa-arrow-left"></i>
-                </button>
-                <div>
-                  <h1 class="text-white text-2xl font-bold">Submit Your Work</h1>
-                  <p class="text-white text-opacity-80">No active task</p>
-                </div>
-              </div>
-            </header>
-
-            <!-- No Task Message -->
-            <div class="px-6 py-12">
-              <div class="bg-white rounded-2xl shadow-lg p-8 text-center">
-                <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <i class="fas fa-tasks text-purple-600 text-3xl"></i>
-                </div>
-                <h3 class="text-xl font-bold mb-2">No Active Task</h3>
-                <p class="text-gray-600 mb-6">Accept a task first to start working</p>
-                <button onclick="showTasks('short-story')" class="px-6 py-3 gradient-bg text-white rounded-xl font-semibold">
-                  Browse Available Tasks
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
-        document.getElementById('mainContent').innerHTML = content;
-        return;
-      }
-      
-      const content = `
-        <div class="min-h-screen pb-20">
-          <!-- Header -->
-          <header class="gradient-bg px-6 py-6">
-            <div class="flex items-center gap-4">
-              <button onclick="showDashboard()" class="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center text-white">
-                <i class="fas fa-arrow-left"></i>
-              </button>
-              <div>
-                <h1 class="text-white text-2xl font-bold">Submit Your Work</h1>
-                <p class="text-white text-opacity-80">Complete your active task</p>
-              </div>
-            </div>
-          </header>
-
-          <!-- Active Task Info -->
-          <div class="px-6 py-6">
-            <div class="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl shadow-md p-5 mb-6">
-              <div class="flex items-start justify-between mb-3">
-                <div>
-                  <p class="text-sm text-purple-600 font-medium mb-1">ACTIVE TASK</p>
-                  <h3 class="font-bold text-lg text-gray-800">${activeTask.category === 'short-story' ? activeTask.title : activeTask.topic}</h3>
-                </div>
-                <span class="px-3 py-1 bg-purple-600 text-white rounded-full text-xs font-medium">
-                  #${activeTask.id}
-                </span>
-              </div>
-              <div class="grid grid-cols-3 gap-3 mb-3">
-                <div>
-                  <p class="text-xs text-gray-600">Words</p>
-                  <p class="font-bold text-gray-800">${activeTask.words}</p>
-                </div>
-                <div>
-                  <p class="text-xs text-gray-600">Pages</p>
-                  <p class="font-bold text-gray-800">${activeTask.pages}</p>
-                </div>
-                <div>
-                  <p class="text-xs text-gray-600">Payment</p>
-                  <p class="font-bold text-green-600">KES ${activeTask.payment}</p>
-                </div>
-              </div>
-              <p class="text-sm text-gray-700 bg-white p-3 rounded-lg">${activeTask.category === 'short-story' ? activeTask.description : activeTask.question}</p>
-            </div>
-
-            <!-- Submit Form -->
-            <div class="bg-white rounded-2xl shadow-lg p-6">
-              <form onsubmit="handleTaskSubmission(event)" id="submitForm">
-                <input type="hidden" value="${activeTask.id}">
-                <input type="hidden" value="${activeTask.category === 'short-story' ? activeTask.title : activeTask.topic}">
-                <input type="hidden" value="${activeTask.words}">
-                <input type="hidden" value="${activeTask.pages}">
-                <input type="hidden" value="${activeTask.payment}">
-                <input type="hidden" value="${activeTask.category}">
-                
-                <div class="mb-6">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Your Work</label>
-                  <textarea required rows="12" id="workContent" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="Paste your completed work here..."></textarea>
-                  
-                  <div class="mt-3 flex items-center gap-3">
-                    <label class="flex-1 px-4 py-3 bg-gray-50 border-2 border-dashed border-gray-300 rounded-xl text-center cursor-pointer hover:bg-gray-100 transition">
-                      <input type="file" accept=".txt,.doc,.docx" onchange="handleFileUpload(event)" class="hidden">
-                      <i class="fas fa-upload text-gray-500 mr-2"></i>
-                      <span class="text-sm text-gray-600">Or upload file (.txt, .doc, .docx)</span>
-                    </label>
-                  </div>
-                  
-                  <div id="wordCountDisplay" class="mt-2 text-sm text-gray-600">
-                    Word count: <span id="currentWordCount" class="font-bold">0</span> / ${activeTask.words} required
-                  </div>
-                </div>
-                
-                <div class="bg-blue-50 p-4 rounded-xl mb-6">
-                  <div class="flex items-start gap-3">
-                    <i class="fas fa-info-circle text-blue-600 text-xl mt-1"></i>
-                    <div>
-                      <h4 class="font-bold text-gray-800 mb-1">Submission Guidelines</h4>
-                      <ul class="text-sm text-gray-700 space-y-1">
-                        <li>• Ensure your work is original and plagiarism-free</li>
-                        <li>• Meet the exact word count requirement (${activeTask.words} words)</li>
-                        <li>• Review for grammar and spelling errors</li>
-                        <li>• Address all requirements in the task description</li>
-                        <li>• Submissions are reviewed thoroughly before payment</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-                
-                <button type="submit" id="submitBtn" class="w-full py-4 gradient-bg text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105">
-                  <i class="fas fa-paper-plane mr-2"></i>
-                  Submit Work for Review
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      `;
-      document.getElementById('mainContent').innerHTML = content;
-      
-      // Add word counter
-      const textarea = document.getElementById('workContent');
-      textarea.addEventListener('input', updateWordCount);
-    }
-    
-    function updateWordCount() {
-      const textarea = document.getElementById('workContent');
-      const text = textarea.value.trim();
-      const wordCount = text ? text.split(/\s+/).length : 0;
-      document.getElementById('currentWordCount').textContent = wordCount;
-    }
-    
-    function handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const content = e.target.result;
-        document.getElementById('workContent').value = content;
-        updateWordCount();
-        showToast('File uploaded successfully!');
-      };
-      reader.readAsText(file);
-    }
-
-    async function handleTaskSubmission(e) {
-      e.preventDefault();
-      const form = e.target;
-      const submitBtn = document.getElementById('submitBtn');
-      
-      // Disable button during processing
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Reviewing your work...';
-      
-      const taskId = form[0].value;
-      const title = form[1].value;
-      const requiredWords = parseInt(form[2].value);
-      const pages = parseInt(form[3].value);
-      const payment = parseInt(form[4].value);
-      const category = form[5].value;
-      const content = document.getElementById('workContent').value.trim();
-      
-      // Calculate actual word count
-      const actualWordCount = content ? content.split(/\s+/).length : 0;
-      
-      // THOROUGH VALIDATION
-      
-      // 1. Check if content is empty or too short
-      if (!content || actualWordCount < 50) {
-        showToast('Please provide substantial content (minimum 50 words)', 'error');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Submit Work for Review';
-        return;
-      }
-      
-      // 2. Check word count accuracy (must be within 10% of required)
-      const minWords = requiredWords * 0.9;
-      const maxWords = requiredWords * 1.1;
-      
-      if (actualWordCount < minWords) {
-        showToast(`Word count too low: ${actualWordCount}/${requiredWords} required. Please add more content.`, 'error');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Submit Work for Review';
-        return;
-      }
-      
-      if (actualWordCount > maxWords) {
-        showToast(`Word count too high: ${actualWordCount}/${requiredWords} required. Please reduce content.`, 'error');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Submit Work for Review';
-        return;
-      }
-      
-      // 3. Check for random/gibberish text (repeated words or very short sentences)
-      const words = content.toLowerCase().split(/\s+/);
-      const uniqueWords = new Set(words);
-      const uniqueRatio = uniqueWords.size / words.length;
-      
-      if (uniqueRatio < 0.3) {
-        showToast('Your work appears to contain too much repetition. Please submit original content.', 'error');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Submit Work for Review';
-        return;
-      }
-      
-      // 4. Check for proper sentence structure (must have periods, capitals)
-      const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
-      const avgSentenceLength = words.length / sentences.length;
-      
-      if (sentences.length < 5 || avgSentenceLength < 5) {
-        showToast('Your work must contain proper paragraphs and sentence structure.', 'error');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Submit Work for Review';
-        return;
-      }
-      
-      // 5. Check for task relevance by looking for key terms from the description
-      const activeTask = userData.activeTask;
-      const taskDescription = category === 'short-story' ? activeTask.description : activeTask.question;
-      
-      // Extract key terms from task description (words longer than 4 characters)
-      const descWords = taskDescription.toLowerCase().split(/\s+/)
-        .filter(w => w.length > 4 && !['about', 'write', 'story', 'essay', 'through', 'their', 'should', 'would', 'could'].includes(w));
-      
-      const relevantWords = descWords.slice(0, 10); // Take top 10 key terms
-      const contentLower = content.toLowerCase();
-      
-      let matchCount = 0;
-      relevantWords.forEach(word => {
-        if (contentLower.includes(word)) matchCount++;
-      });
-      
-      const relevanceRatio = matchCount / Math.min(relevantWords.length, 5);
-      
-      if (relevanceRatio < 0.3) {
-        showToast('Your work does not appear to address the task requirements. Please review the task description.', 'error');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Submit Work for Review';
-        return;
-      }
-      
-      // 6. Check for proper formatting (must have paragraphs)
-      const paragraphs = content.split(/\n\n+/).filter(p => p.trim().length > 0);
-      
-      if (paragraphs.length < 2) {
-        showToast('Please format your work with proper paragraphs (use double line breaks).', 'error');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>Submit Work for Review';
-        return;
-      }
-      
-      // ALL VALIDATIONS PASSED
-      
-      // Calculate earnings based on task completion progress
-      // Target: KES 150 total for 5 tasks (1 free + 4 premium)
-      // Distribution: KES 30 per task on average
-      const tasksCompleted = userData.tasksCompletedThisMonth;
-      
-      // Task-specific earnings to total KES 150:
-      // Task 1 (free): KES 25
-      // Task 2: KES 28
-      // Task 3: KES 32
-      // Task 4: KES 30
-      // Task 5: KES 35
-      const taskEarnings = [25, 28, 32, 30, 35];
-      const earnedPayment = taskEarnings[tasksCompleted] || 30;
-      
-      // Calculate quality score based on earned amount
-      const qualityScore = Math.floor((earnedPayment / payment) * 100);
-      const earnedUSD = (earnedPayment / 130).toFixed(2);
-      
-      const submissionData = {
-        taskId: taskId,
-        title: title,
-        category: category,
-        requiredWords: requiredWords,
-        actualWordCount: actualWordCount,
-        pages: pages,
-        payment: payment,
-        earnedPayment: earnedPayment,
-        qualityScore: qualityScore,
-        content: content,
-        submittedAt: new Date().toLocaleString(),
-        userEmail: userData.email,
-        userName: userData.fullName
-      };
-      
-      // Update task status to "submitted" (pending review)
-      setTaskStatus(taskId, 'submitted');
-      
-      // Clear active task
-      userData.activeTask = null;
-      
-      userData.submittedTasks.push(submissionData);
-      
-      // Increment monthly task counter
-      userData.tasksCompletedThisMonth += 1;
-      
-      // Add low earning to balance
-      userData.totalEarnings += parseFloat(earnedUSD);
-      
-      // Update task status to "approved" after processing
-      setTaskStatus(taskId, 'approved');
-      
-      userData.activities.push({
-        type: 'approved',
-        description: `${submissionData.title} - Quality: ${qualityScore}%`,
-        amount: parseFloat(earnedUSD),
-        time: submissionData.submittedAt
-      });
-      
-      localStorage.setItem('creativepay_user', JSON.stringify(userData));
-      
-      // Send to Web3Forms
-      await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          access_key: '4d568274-521b-452a-a113-62eed5ad915b',
-          subject: `Task Submission #${taskId} - ${title} - Creativepay`,
-          ...submissionData,
-          contentPreview: content.substring(0, 500) + '...'
-        })
-      });
-      
-      // Check if balance reached KES 100 (trigger cashout)
-      const balanceKES = userData.totalEarnings * 130;
-      
-      if (balanceKES >= 100) {
-        // Show cashout prompt instead of quality feedback
-        showCashoutPrompt(qualityScore, earnedPayment, earnedUSD, payment);
-      } else {
-        // Show quality feedback modal
-        showQualityFeedbackModal(qualityScore, earnedPayment, earnedUSD, payment);
-      }
-    }
-
-    function showSubscription() {
-      currentPage = 'subscription';
-      userData = JSON.parse(localStorage.getItem('creativepay_user'));
-      
-      const content = `
-        <div class="min-h-screen pb-20">
-          <!-- Header -->
-          <header class="gradient-bg px-6 py-6">
-            <div class="flex items-center gap-4">
-              <button onclick="showDashboard()" class="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center text-white">
-                <i class="fas fa-arrow-left"></i>
-              </button>
-              <div>
-                <h1 class="text-white text-2xl font-bold">Become a Permanent Writer</h1>
-                <p class="text-white text-opacity-80">Unlock unlimited earnings</p>
-              </div>
-            </div>
-          </header>
-
-          <!-- Subscription Content -->
-          <div class="px-6 py-6">
-            ${userData.isSubscribed ? `
-              <!-- Already Subscribed -->
-              <div class="bg-white rounded-2xl shadow-lg p-8 text-center mb-6">
-                <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <i class="fas fa-crown text-green-600 text-4xl"></i>
-                </div>
-                <h3 class="text-2xl font-bold mb-2 text-green-600">Active Subscription</h3>
-                <p class="text-gray-600 mb-4">You have unlimited access to all tasks!</p>
-                <div class="bg-green-50 p-4 rounded-xl">
-                  <p class="text-sm text-gray-700">Keep writing and earning without limits!</p>
-                </div>
-              </div>
-            ` : `
-              <!-- Subscription Offer -->
-              <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl shadow-lg p-8 mb-6">
-                <div class="text-center mb-6">
-                  <div class="w-20 h-20 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-crown text-white text-4xl"></i>
-                  </div>
-                  <h3 class="text-3xl font-bold mb-2">Premium Writer Plan</h3>
-                  <p class="text-gray-600">Unlock unlimited task access</p>
-                </div>
-                
-                <div class="bg-white p-6 rounded-2xl mb-6 text-center">
-                  <p class="text-sm text-gray-600 mb-2">One-Time Payment</p>
-                  <p class="text-5xl font-bold text-purple-600 mb-1">KES 310</p>
-                  <p class="text-sm text-gray-500">Lifetime Access</p>
-                </div>
-                
-                <!-- Benefits -->
-                <div class="space-y-4 mb-6">
-                  <div class="flex items-start gap-3 bg-white p-4 rounded-xl">
-                    <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <i class="fas fa-check text-green-600"></i>
-                    </div>
-                    <div>
-                      <h4 class="font-bold text-gray-800">4 Premium Tasks</h4>
-                      <p class="text-sm text-gray-600">Complete 4 additional tasks after your free task (5 total)</p>
-                    </div>
-                  </div>
-                  
-                  <div class="flex items-start gap-3 bg-white p-4 rounded-xl">
-                    <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <i class="fas fa-dollar-sign text-blue-600"></i>
-                    </div>
-                    <div>
-                      <h4 class="font-bold text-gray-800">Earn KES 150 Total</h4>
-                      <p class="text-sm text-gray-600">Complete all 5 tasks and earn KES 150 in total</p>
-                    </div>
-                  </div>
-                  
-                  <div class="flex items-start gap-3 bg-white p-4 rounded-xl">
-                    <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <i class="fas fa-bolt text-purple-600"></i>
-                    </div>
-                    <div>
-                      <h4 class="font-bold text-gray-800">Priority Support</h4>
-                      <p class="text-sm text-gray-600">Get faster responses and dedicated assistance</p>
-                    </div>
-                  </div>
-                  
-                  <div class="flex items-start gap-3 bg-white p-4 rounded-xl">
-                    <div class="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <i class="fas fa-star text-orange-600"></i>
-                    </div>
-                    <div>
-                      <h4 class="font-bold text-gray-800">Premium Writer Badge</h4>
-                      <p class="text-sm text-gray-600">Stand out with your permanent writer status</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="bg-yellow-50 p-4 rounded-xl mb-6 border-l-4 border-yellow-500">
-                  <div class="flex items-start gap-3">
-                    <i class="fas fa-info-circle text-yellow-600 text-xl mt-1"></i>
-                    <div>
-                      <h4 class="font-bold text-gray-800 mb-1">Limited Time Offer!</h4>
-                      <p class="text-sm text-gray-700">Pay only KES 310 once and unlock 4 premium tasks. Complete 1 free + 4 premium tasks to earn KES 150 total!</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <a href="https://paystack.shop/creativepay-kE" target="_blank" rel="noopener noreferrer" class="block w-full py-4 gradient-bg text-white rounded-xl font-semibold text-lg text-center shadow-lg hover:shadow-xl transition transform hover:scale-105 mb-4">
-                  <i class="fas fa-shopping-cart mr-2"></i>
-                  Subscribe Now - KES 310
-                </a>
-              </div>
-              
-              <!-- Verification Section -->
-              <div class="bg-white rounded-2xl shadow-lg p-6">
-                <h4 class="font-bold text-lg mb-4">Already Subscribed?</h4>
-                <p class="text-sm text-gray-600 mb-4">If you've completed payment but not redirected, paste your payment confirmation message below for verification:</p>
-                
-                <form onsubmit="handleSubscriptionVerification(event)" id="verificationForm">
-                  <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Payment Message/Transaction ID</label>
-                    <textarea required rows="4" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="Paste your payment confirmation message here..."></textarea>
-                    <p class="text-xs text-gray-500 mt-2">Include transaction ID, reference number, or M-Pesa message</p>
-                  </div>
-                  
-                  <button type="submit" class="w-full py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    Verify Payment
-                  </button>
-                </form>
-              </div>
-            `}
-          </div>
-        </div>
-      `;
-      document.getElementById('mainContent').innerHTML = content;
-    }
-
-    async function handleSubscriptionVerification(e) {
-      e.preventDefault();
-      const form = e.target;
-      const paymentMessage = form[0].value.trim().toLowerCase();
-      
-      // Check for M-Pesa payment indicators
-      const isMpesaValid = 
-        (paymentMessage.includes('confirmed') || 
-         paymentMessage.includes('received') || 
-         paymentMessage.includes('paid') ||
-         paymentMessage.includes('transaction') ||
-         paymentMessage.includes('mpesa') ||
-         paymentMessage.includes('m-pesa')) &&
-        (paymentMessage.match(/\d{10,}/)); // Has transaction ID (10+ digits)
-      
-      if (!isMpesaValid) {
-        showToast('Invalid payment message. Please paste the complete M-Pesa confirmation message.', 'error');
-        return;
-      }
-      
-      // Send verification request
-      await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          access_key: '4d568274-521b-452a-a113-62eed5ad915b',
-          subject: 'Subscription Verification - Auto Approved - Creativepay',
-          userEmail: userData.email,
-          userName: userData.fullName,
-          paymentMessage: form[0].value,
-          verifiedAt: new Date().toLocaleString()
-        })
-      });
-      
-      // Instantly activate subscription
-      userData.isSubscribed = true;
-      localStorage.setItem('creativepay_user', JSON.stringify(userData));
-      
-      showToast('Payment verified! Subscription activated successfully!');
-      
-      // Refresh subscription page to show active status
-      setTimeout(() => showSubscription(), 1500);
-    }
-
-    function showQualityFeedbackModal(qualityScore, earnedKES, earnedUSD, expectedPayment) {
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      
-      // Generate client feedback based on quality score
-      const clientFeedbacks = [
-        { min: 90, feedback: "Outstanding work! Your writing exceeded expectations with excellent structure, creativity, and attention to detail. We'd love to work with you again!" },
-        { min: 80, feedback: "Great job! Your submission was well-written and met all requirements. Strong narrative flow and good understanding of the topic." },
-        { min: 70, feedback: "Good work! Your writing showed solid effort. There's room for improvement in depth and creativity, but overall a decent submission." },
-        { min: 60, feedback: "Acceptable work. Your submission met basic requirements but lacked depth and polish. Consider investing more time in research and editing." },
-        { min: 0, feedback: "Your work needs improvement. While you completed the task, the quality didn't meet our standards. Focus on originality, structure, and proofreading." }
-      ];
-      
-      const clientFeedback = clientFeedbacks.find(f => qualityScore >= f.min).feedback;
-      
-      modal.innerHTML = `
-        <div class="modal-content" style="max-width: 600px;">
-          <div class="p-8">
-            <!-- Progress Animation -->
-            <div id="reviewProgress" class="text-center">
-              <div class="flex justify-center mb-6">
-                <div class="relative w-32 h-32">
-                  <svg class="transform -rotate-90 w-32 h-32 animate-spin" style="animation-duration: 3s;">
-                    <circle cx="64" cy="64" r="56" stroke="#e5e7eb" stroke-width="8" fill="none" />
-                    <circle id="reviewCircle" cx="64" cy="64" r="56" stroke="url(#reviewGradient)" stroke-width="8" fill="none"
-                      stroke-dasharray="351.86" stroke-dashoffset="87.965" stroke-linecap="round" />
-                    <defs>
-                      <linearGradient id="reviewGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-                        <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <div class="absolute inset-0 flex items-center justify-center">
-                    <span id="reviewPercent" class="text-3xl font-bold text-purple-600">0%</span>
-                  </div>
-                </div>
-              </div>
-              
-              <h2 class="text-2xl font-bold text-gray-800 mb-2">Reviewing Your Work</h2>
-              <p class="text-gray-600 mb-4">Dear <span class="font-semibold text-purple-600">${userData.fullName || 'Writer'}</span>,</p>
-              <p class="text-gray-700">Our client <span class="font-semibold text-blue-600">${userData.activeTask.client}</span> is currently reviewing your submission...</p>
-            </div>
-            
-            <!-- Results (Hidden Initially) -->
-            <div id="reviewResults" style="display: none;">
-              <!-- Success Icon -->
-              <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-check-circle text-green-600 text-4xl"></i>
-              </div>
-              
-              <!-- Title -->
-              <h2 class="text-2xl font-bold text-center mb-2">Review Complete!</h2>
-              <p class="text-center text-gray-600 mb-6">Your work has been evaluated</p>
-              
-              <!-- Score Display -->
-              <div class="bg-gradient-to-br from-purple-50 to-blue-50 p-6 rounded-2xl mb-6 border-2 border-purple-200">
-                <div class="text-center mb-4">
-                  <p class="text-sm text-gray-600 mb-2">Quality Score</p>
-                  <div class="flex items-center justify-center gap-3">
-                    <div class="w-24 h-24 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center">
-                      <span class="text-4xl font-bold text-white">${qualityScore}%</span>
-                    </div>
-                  </div>
-                  <p class="text-xs text-gray-500 mt-2">Based on creativity, accuracy & structure</p>
-                </div>
-              </div>
-              
-              <!-- Earnings -->
-              <div class="bg-green-50 p-6 rounded-2xl mb-6 border-2 border-green-200">
-                <div class="grid grid-cols-2 gap-4">
-                  <div class="text-center">
-                    <p class="text-sm text-gray-600 mb-1">Expected</p>
-                    <p class="text-2xl font-bold text-gray-400 line-through">KES ${expectedPayment}</p>
-                  </div>
-                  <div class="text-center">
-                    <p class="text-sm text-gray-600 mb-1">You Earned</p>
-                    <p class="text-3xl font-bold text-green-600">KES ${earnedKES}</p>
-                    <p class="text-sm text-gray-600">($${earnedUSD} USD)</p>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Client Feedback -->
-              <div class="bg-blue-50 p-5 rounded-xl mb-6 border-l-4 border-blue-500">
-                <div class="flex items-start gap-3">
-                  <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <i class="fas fa-comment-dots text-blue-600"></i>
-                  </div>
-                  <div>
-                    <h4 class="font-bold text-gray-800 mb-2">Client Feedback</h4>
-                    <p class="text-sm text-gray-700 italic">"${clientFeedback}"</p>
-                    <p class="text-xs text-gray-500 mt-2">- ${userData.activeTask.client}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Progress Info -->
-              <div class="bg-purple-50 p-5 rounded-xl mb-6 border-l-4 border-purple-500">
-                <div class="flex items-start gap-3">
-                  <i class="fas fa-chart-line text-purple-600 text-xl mt-1"></i>
-                  <div>
-                    <h4 class="font-bold text-gray-800 mb-1">Your Progress</h4>
-                    <p class="text-sm text-gray-700">
-                      ${userData.tasksCompletedThisMonth} of 5 tasks completed. ${5 - userData.tasksCompletedThisMonth} tasks remaining.
-                    </p>
-                    <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                      <div class="bg-gradient-to-r from-purple-600 to-blue-600 h-2 rounded-full" style="width: ${(userData.tasksCompletedThisMonth / 5) * 100}%"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Action Button -->
-              <button onclick="this.closest('.modal').remove(); showDashboard();" class="w-full py-4 gradient-bg text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition">
-                Continue
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-      
-      // Start review animation
-      startReviewAnimation();
-    }
-    
-    async function startReviewAnimation() {
-      const reviewProgress = document.getElementById('reviewProgress');
-      const reviewResults = document.getElementById('reviewResults');
-      const reviewCircle = document.getElementById('reviewCircle');
-      const reviewPercent = document.getElementById('reviewPercent');
-      
-      const circumference = 351.86;
-      const duration = 5000; // 5 seconds
-      const steps = 100;
-      const stepDuration = duration / steps;
-      
-      for (let i = 0; i <= 100; i++) {
-        const offset = circumference - (i / 100) * circumference;
-        reviewCircle.style.strokeDashoffset = offset;
-        reviewPercent.textContent = `${i}%`;
-        
-        await new Promise(resolve => setTimeout(resolve, stepDuration));
-      }
-      
-      // Hide progress, show results
-      reviewProgress.style.display = 'none';
-      reviewResults.style.display = 'block';
-    }
-    
-    function showCashoutPrompt(qualityScore, earnedKES, earnedUSD, expectedPayment) {
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      const balanceKES = (userData.totalEarnings * 130).toFixed(2);
-      const balanceUSD = userData.totalEarnings.toFixed(2);
-      
-      modal.innerHTML = `
-        <div class="modal-content" style="max-width: 500px;">
-          <div class="p-8">
-            <!-- Icon -->
-            <div class="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
-              <i class="fas fa-money-bill-wave text-white text-4xl"></i>
-            </div>
-            
-            <!-- Title -->
-            <h2 class="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Cashout Available!</h2>
-            <p class="text-center text-gray-600 mb-6">Your balance has reached the minimum withdrawal amount</p>
-            
-            <!-- Balance Display -->
-            <div class="bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-2xl mb-6 border-2 border-green-300">
-              <div class="text-center mb-4">
-                <p class="text-sm text-gray-600 mb-2">Current Balance</p>
-                <p class="text-5xl font-bold text-green-600 mb-2">KES ${balanceKES}</p>
-                <p class="text-xl text-gray-600">($${balanceUSD} USD)</p>
-              </div>
-              
-              <div class="border-t border-green-200 pt-4 mt-4">
-                <p class="text-center text-sm text-gray-700">
-                  <i class="fas fa-check-circle text-green-600 mr-2"></i>
-                  Eligible for instant withdrawal
-                </p>
-              </div>
-            </div>
-            
-            <!-- Latest Task Info -->
-            <div class="bg-blue-50 p-4 rounded-xl mb-6 border-l-4 border-blue-500">
-              <div class="flex items-start gap-3">
-                <i class="fas fa-trophy text-blue-600 text-xl mt-1"></i>
-                <div>
-                  <h4 class="font-bold text-gray-800 mb-1">Latest Task Completed</h4>
-                  <p class="text-sm text-gray-700">You earned KES ${earnedKES} ($${earnedUSD})</p>
-                  <p class="text-xs text-gray-600 mt-1">${userData.tasksCompletedThisMonth} of 5 tasks completed</p>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Action Buttons -->
-            <div class="space-y-3">
-              <button onclick="this.closest('.modal').remove(); showWithdraw();" class="w-full py-4 bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105">
-                <i class="fas fa-hand-holding-usd mr-2"></i>
-                Withdraw Now
-              </button>
-              
-              <button onclick="this.closest('.modal').remove(); showDashboard();" class="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition">
-                Continue Working
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-    }
-
-    function showEarnings() {
-      currentPage = 'earnings';
-      userData = JSON.parse(localStorage.getItem('creativepay_user'));
-      
-      const content = `
-        <div class="min-h-screen pb-20">
-          <!-- Header -->
-          <header class="gradient-bg px-6 py-6">
-            <div class="flex items-center gap-4">
-              <button onclick="showDashboard()" class="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center text-white">
-                <i class="fas fa-arrow-left"></i>
-              </button>
-              <div>
-                <h1 class="text-white text-2xl font-bold">Earnings History</h1>
-                <p class="text-white text-opacity-80">Track your income</p>
-              </div>
-            </div>
-          </header>
-
-          <!-- Stats -->
-          <div class="px-6 py-6">
-            <div class="grid grid-cols-2 gap-4 mb-6">
-              <div class="bg-white rounded-2xl shadow-md p-5">
-                <div class="w-12 h-12 gradient-green-pink rounded-xl flex items-center justify-center mb-3">
-                  <i class="fas fa-dollar-sign text-white text-xl"></i>
-                </div>
-                <p class="text-sm text-gray-600 mb-1">Total Earned</p>
-                <p class="text-2xl font-bold text-gray-800">$${userData.totalEarnings.toFixed(2)}</p>
-              </div>
-              
-              <div class="bg-white rounded-2xl shadow-md p-5">
-                <div class="w-12 h-12 gradient-teal-purple rounded-xl flex items-center justify-center mb-3">
-                  <i class="fas fa-tasks text-white text-xl"></i>
-                </div>
-                <p class="text-sm text-gray-600 mb-1">Tasks Done</p>
-                <p class="text-2xl font-bold text-gray-800">${userData.approvedTasks.length}</p>
-              </div>
-            </div>
-
-            <!-- Transaction History -->
-            <div class="bg-white rounded-2xl shadow-md p-5">
-              <h3 class="font-bold text-lg mb-4">Transaction History</h3>
-              <div class="space-y-3">
-                ${userData.activities.length > 0 ? userData.activities.reverse().map((activity, index) => `
-                  <div class="flex items-center justify-between p-4 rounded-xl ${index % 3 === 0 ? 'bg-purple-50' : index % 3 === 1 ? 'bg-blue-50' : 'bg-green-50'}">
-                    <div class="flex items-center gap-3">
-                      <div class="w-10 h-10 ${activity.type === 'bonus' ? 'bg-green-100' : activity.type === 'approved' ? 'bg-blue-100' : activity.type === 'withdrawal' ? 'bg-orange-100' : 'bg-purple-100'} rounded-xl flex items-center justify-center">
-                        <i class="fas ${activity.type === 'bonus' ? 'fa-gift text-green-600' : activity.type === 'approved' ? 'fa-check text-blue-600' : activity.type === 'withdrawal' ? 'fa-arrow-up text-orange-600' : 'fa-upload text-purple-600'}"></i>
-                      </div>
-                      <div>
-                        <p class="font-medium text-gray-800">${activity.description}</p>
-                        <p class="text-xs text-gray-500">${activity.time}</p>
-                      </div>
-                    </div>
-                    <p class="font-bold ${activity.amount > 0 ? 'text-green-600' : 'text-orange-600'}">${activity.amount > 0 ? '+' : ''}$${Math.abs(activity.amount).toFixed(2)}</p>
-                  </div>
-                `).join('') : '<p class="text-center text-gray-500 py-4">No transactions yet</p>'}
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-      document.getElementById('mainContent').innerHTML = content;
-    }
-
-    function showWithdraw() {
-      currentPage = 'withdraw';
-      userData = JSON.parse(localStorage.getItem('creativepay_user'));
-      
-      const content = `
-        <div class="min-h-screen pb-20">
-          <!-- Header -->
-          <header class="gradient-bg px-6 py-6">
-            <div class="flex items-center gap-4">
-              <button onclick="showDashboard()" class="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center text-white">
-                <i class="fas fa-arrow-left"></i>
-              </button>
-              <div>
-                <h1 class="text-white text-2xl font-bold">Withdraw Funds</h1>
-                <p class="text-white text-opacity-80">Request payout</p>
-              </div>
-            </div>
-          </header>
-
-          <!-- Withdraw Form -->
-          <div class="px-6 py-6">
-            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-              <div class="bg-purple-50 p-4 rounded-xl mb-6">
-                <p class="text-sm text-gray-600 mb-1">Available Balance</p>
-                <p class="text-3xl font-bold text-purple-600">$${userData.totalEarnings.toFixed(2)}</p>
-              </div>
-              
-              <form onsubmit="handleWithdrawal(event)" id="withdrawForm">
-                <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Withdrawal Currency</label>
-                  <select required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" onchange="updateWithdrawAmount(this.value)">
-                    <option value="USD">USD (Dollars)</option>
-                    <option value="KES">KES (Kenyan Shillings)</option>
-                  </select>
-                </div>
-                
-                <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Amount</label>
-                  <input type="number" required min="0.01" step="0.01" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="Enter amount" id="withdrawAmount" oninput="calculateWithdrawFees()">
-                  <p class="text-xs text-gray-500 mt-2">No minimum withdrawal required</p>
-                </div>
-                
-                <!-- Fee Breakdown -->
-                <div id="feeBreakdown" class="mb-4 bg-gray-50 p-4 rounded-xl" style="display: none;">
-                  <h4 class="font-semibold text-gray-800 mb-3 text-sm">Fee Breakdown</h4>
-                  <div class="space-y-2 text-sm">
-                    <div class="flex justify-between">
-                      <span class="text-gray-600">Amount Requested:</span>
-                      <span class="font-medium text-gray-800" id="requestedAmount">$0.00</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-gray-600">Platform Fee (2%):</span>
-                      <span class="font-medium text-red-600" id="platformFee">-$0.00</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-gray-600">Transaction Fee (3%):</span>
-                      <span class="font-medium text-red-600" id="transactionFee">-$0.00</span>
-                    </div>
-                    <div class="flex justify-between">
-                      <span class="text-gray-600">VAT (10%):</span>
-                      <span class="font-medium text-red-600" id="vatFee">-$0.00</span>
-                    </div>
-                    <div class="border-t border-gray-300 pt-2 mt-2 flex justify-between">
-                      <span class="text-gray-800 font-bold">You'll Receive:</span>
-                      <span class="font-bold text-green-600 text-lg" id="finalAmount">$0.00</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div class="mb-6">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
-                  <div class="bg-gray-50 p-4 rounded-xl">
-                    <p class="text-sm text-gray-600 mb-1">Current Method</p>
-                    <p class="font-semibold text-gray-800 capitalize">${userData.paymentMethod || 'Not set'}</p>
-                    <p class="text-sm text-gray-600">${userData.paymentDetails || 'No details'}</p>
-                  </div>
-                </div>
-                
-                <div class="bg-yellow-50 p-4 rounded-xl mb-6 border-l-4 border-yellow-500">
-                  <div class="flex items-start gap-3">
-                    <i class="fas fa-clock text-yellow-600 text-xl mt-1"></i>
-                    <div>
-                      <h4 class="font-bold text-gray-800 mb-1">Processing Time</h4>
-                      <p class="text-sm text-gray-700">Withdrawals are processed within 1-3 business days</p>
-                    </div>
-                  </div>
-                </div>
-                
-                <button type="submit" class="w-full py-4 gradient-bg text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105">
-                  <i class="fas fa-paper-plane mr-2"></i>
-                  Request Withdrawal
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-      `;
-      document.getElementById('mainContent').innerHTML = content;
-    }
-
-    function calculateWithdrawFees() {
-      const amountInput = document.getElementById('withdrawAmount');
-      const amount = parseFloat(amountInput.value) || 0;
-      
-      if (amount <= 0) {
-        document.getElementById('feeBreakdown').style.display = 'none';
-        return;
-      }
-      
-      const platformFee = amount * 0.02;
-      const transactionFee = amount * 0.03;
-      const vatFee = amount * 0.10;
-      const finalAmount = amount - platformFee - transactionFee - vatFee;
-      const finalAmountKES = finalAmount * 130;
-      
-      document.getElementById('feeBreakdown').style.display = 'block';
-      document.getElementById('requestedAmount').textContent = `$${amount.toFixed(2)}`;
-      document.getElementById('platformFee').textContent = `-$${platformFee.toFixed(2)}`;
-      document.getElementById('transactionFee').textContent = `-$${transactionFee.toFixed(2)}`;
-      document.getElementById('vatFee').textContent = `-$${vatFee.toFixed(2)}`;
-      document.getElementById('finalAmount').textContent = `$${finalAmount.toFixed(2)} (KES ${finalAmountKES.toFixed(2)})`;
-    }
-
-    function updateWithdrawAmount(currency) {
-      const input = document.getElementById('withdrawAmount');
-      if (currency === 'USD') {
-        input.placeholder = `Max: $${userData.totalEarnings.toFixed(2)}`;
-      } else {
-        input.placeholder = `Max: KES ${(userData.totalEarnings * 130).toFixed(2)}`;
-      }
-      calculateWithdrawFees();
-    }
-
-    async function handleWithdrawal(e) {
-      e.preventDefault();
-      const form = e.target;
-      const currency = form[0].value;
-      const amount = parseFloat(form[1].value);
-      
-      const maxAmount = currency === 'USD' ? userData.totalEarnings : userData.totalEarnings * 130;
-      
-      if (amount <= 0) {
-        showToast('Please enter a valid amount', 'error');
-        return;
-      }
-      
-      if (amount > maxAmount) {
-        showToast('Insufficient balance', 'error');
-        return;
-      }
-      
-      const platformFee = amount * 0.02;
-      const transactionFee = amount * 0.03;
-      const vatFee = amount * 0.10;
-      const finalAmount = amount - platformFee - transactionFee - vatFee;
-      
-      showWithdrawalVerification(currency, amount, finalAmount, platformFee, transactionFee, vatFee);
-    }
-    
-    function showWithdrawalVerification(currency, amount, finalAmount, platformFee, transactionFee, vatFee) {
-      const modal = document.createElement('div');
-      modal.className = 'modal active';
-      modal.innerHTML = `
-        <div class="modal-content" style="max-width: 500px;">
-          <div class="p-8">
-            <div class="flex justify-center mb-6">
-              <div class="relative w-32 h-32">
-                <svg class="transform -rotate-90 w-32 h-32">
-                  <circle cx="64" cy="64" r="56" stroke="#e5e7eb" stroke-width="8" fill="none" />
-                  <circle id="progressCircle" cx="64" cy="64" r="56" stroke="url(#gradient)" stroke-width="8" fill="none"
-                    stroke-dasharray="351.86" stroke-dashoffset="351.86" stroke-linecap="round"
-                    style="transition: stroke-dashoffset 0.3s ease;" />
-                  <defs>
-                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-                      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <div class="absolute inset-0 flex items-center justify-center">
-                  <span id="progressPercent" class="text-3xl font-bold text-purple-600">0%</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="text-center mb-6">
-              <h3 id="verificationStatus" class="text-xl font-bold text-gray-800 mb-2">Initializing...</h3>
-              <p id="verificationSubtext" class="text-sm text-gray-600"></p>
-            </div>
-            
-            <div id="detailsCard" class="bg-gradient-to-br from-purple-50 to-blue-50 p-5 rounded-2xl mb-6" style="display: none;">
-              <h4 class="font-bold text-gray-800 mb-3 text-center">Withdrawal Summary</h4>
-              
-              <div class="bg-white p-4 rounded-xl mb-3">
-                <div class="space-y-2 text-sm">
-                  <div class="flex justify-between">
-                    <span class="text-gray-600">Payment Method:</span>
-                    <span class="font-medium text-gray-800 capitalize">${userData.paymentMethod}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-gray-600">Account:</span>
-                    <span class="font-medium text-gray-800">${userData.paymentDetails}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div class="bg-white p-4 rounded-xl space-y-2 text-sm">
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Requested Amount:</span>
-                  <span class="font-medium text-gray-800">$${amount.toFixed(2)}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Platform Fee (2%):</span>
-                  <span class="font-medium text-red-600">-$${platformFee.toFixed(2)}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600">Transaction Fee (3%):</span>
-                  <span class="font-medium text-red-600">-$${transactionFee.toFixed(2)}</span>
-                </div>
-                <div class="flex justify-between">
-                  <span class="text-gray-600">VAT (10%):</span>
-                  <span class="font-medium text-red-600">-$${vatFee.toFixed(2)}</span>
-                </div>
-                <div class="border-t border-gray-200 pt-2 mt-2 flex justify-between">
-                  <span class="text-gray-800 font-bold">You'll Receive:</span>
-                  <span class="font-bold text-green-600 text-xl">$${finalAmount.toFixed(2)}</span>
-                </div>
-              </div>
-            </div>
-            
-            <div id="successState" style="display: none;">
-              <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-check text-green-600 text-4xl"></i>
-              </div>
-              <h3 class="text-2xl font-bold text-center mb-2">Withdrawal Submitted!</h3>
-              <p class="text-center text-gray-600 mb-6">Amount: <span class="font-bold text-green-600">$${finalAmount.toFixed(2)}</span></p>
-              <button onclick="this.closest('.modal').remove(); showDashboard();" class="w-full py-4 gradient-bg text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition">
-                View Dashboard
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-      document.body.appendChild(modal);
-      
-      startVerificationProcess(currency, amount, finalAmount, platformFee, transactionFee, vatFee);
-    }
-    
-    async function startVerificationProcess(currency, amount, finalAmount, platformFee, transactionFee, vatFee) {
-      const progressCircle = document.getElementById('progressCircle');
-      const progressPercent = document.getElementById('progressPercent');
-      const verificationStatus = document.getElementById('verificationStatus');
-      const verificationSubtext = document.getElementById('verificationSubtext');
-      const detailsCard = document.getElementById('detailsCard');
-      const successState = document.getElementById('successState');
-      
-      const circumference = 351.86;
-      
-      const stages = [
-        { percent: 25, status: 'Verifying User Details...', subtext: 'Confirming account information', duration: 1500 },
-        { percent: 50, status: 'Authenticating Account...', subtext: 'Validating payment credentials', duration: 1500 },
-        { percent: 75, status: 'Linking Account to Payment ���', subtext: 'Establishing secure connection', duration: 1500 },
-        { percent: 100, status: 'Processing Complete', subtext: 'Finalizing withdrawal', duration: 1000 }
-      ];
-      
-      for (let i = 0; i < stages.length; i++) {
-        const stage = stages[i];
-        
-        verificationStatus.textContent = stage.status;
-        verificationSubtext.textContent = stage.subtext;
-        
-        const offset = circumference - (stage.percent / 100) * circumference;
-        progressCircle.style.strokeDashoffset = offset;
-        progressPercent.textContent = `${stage.percent}%`;
-        
-        if (stage.percent === 50) {
-          detailsCard.style.display = 'block';
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
         }
-        
-        await new Promise(resolve => setTimeout(resolve, stage.duration));
-      }
-      
-      await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          access_key: '4d568274-521b-452a-a113-62eed5ad915b',
-          subject: 'Withdrawal Request - Creativepay',
-          currency,
-          requestedAmount: amount,
-          platformFee,
-          transactionFee,
-          vatFee,
-          finalAmount,
-          paymentMethod: userData.paymentMethod,
-          paymentDetails: userData.paymentDetails,
-          requestedAt: new Date().toLocaleString(),
-          userEmail: userData.email
-        })
-      });
-      
-      userData.activities.push({
-        type: 'withdrawal',
-        description: 'Disbursement in Progress',
-        amount: -finalAmount,
-        time: new Date().toLocaleString()
-      });
-      
-      userData.totalEarnings -= finalAmount;
-      
-      localStorage.setItem('creativepay_user', JSON.stringify(userData));
-      
-      detailsCard.style.display = 'none';
-      document.querySelector('.relative.w-32.h-32').style.display = 'none';
-      verificationStatus.style.display = 'none';
-      verificationSubtext.style.display = 'none';
-      successState.style.display = 'block';
-    }
 
-    function showSupport() {
-      currentPage = 'support';
-      const content = `
-        <div class="min-h-screen pb-20">
-          <!-- Header -->
-          <header class="gradient-bg px-6 py-6">
-            <div class="flex items-center gap-4">
-              <button onclick="showDashboard()" class="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center text-white">
-                <i class="fas fa-arrow-left"></i>
-              </button>
-              <div>
-                <h1 class="text-white text-2xl font-bold">Support</h1>
-                <p class="text-white text-opacity-80">We're here to help</p>
-              </div>
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .hero-image {
+            flex: 1;
+            text-align: center;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .features {
+            padding: 80px 5%;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 50px;
+            color: var(--dark);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 40px 30px;
+            background: var(--light);
+            border-radius: 20px;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .categories {
+            padding: 80px 5%;
+            background: var(--light);
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .category-card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .category-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .category-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .category-card h3 {
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .category-price {
+            color: var(--success);
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .testimonials {
+            padding: 80px 5%;
+            background: white;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .testimonial-card {
+            background: var(--light);
+            padding: 30px;
+            border-radius: 20px;
+            transition: var(--transition);
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow);
+        }
+
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 20px;
+            color: var(--gray);
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .cta {
+            background: var(--gradient);
+            padding: 80px 5%;
+            text-align: center;
+            color: white;
+        }
+
+        .cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+        }
+
+        .cta p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 60px 5% 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+
+        .footer-section a {
+            color: var(--gray);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+            transition: var(--transition);
+        }
+
+        .footer-section a:hover {
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--gray);
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding-top: 100px;
+            }
+
+            .hero-stats {
+                justify-content: center;
+            }
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="toastContainer" class="toast-container"></div>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">TaskMaster Pro</a>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#categories">Categories</a>
+            <a href="#testimonials">Testimonials</a>
+            <a href="login.html" class="btn btn-outline btn-sm">Login</a>
+            <a href="register.html" class="btn btn-primary btn-sm">Sign Up</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Earn Money by<br>Completing Simple Tasks</h1>
+            <p>Join thousands of satisfied users who are earning daily from home.<br>Simple tasks, instant payments, and 24/7 support.</p>
+            <a href="register.html" class="btn btn-primary btn-lg pulse">Start Earning Now</a>
+            
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">10,000+</span>
+                    <span>Happy Users</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">$500K+</span>
+                    <span>Paid Out</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">24/7</span>
+                    <span>Support</span>
+                </div>
             </div>
-          </header>
+        </div>
+        <div class="hero-image">
+            <svg width="400" height="400" viewBox="0 0 400 400">
+                <circle cx="200" cy="200" r="180" fill="rgba(255,255,255,0.1)"/>
+                <path d="M150 200 L250 200 M200 150 L200 250" stroke="white" stroke-width="10" stroke-linecap="round"/>
+                <circle cx="200" cy="200" r="50" fill="rgba(255,255,255,0.2)"/>
+            </svg>
+        </div>
+    </section>
 
-          <!-- Support Form -->
-          <div class="px-6 py-6">
-            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
-              <h3 class="font-bold text-lg mb-4">Contact Support</h3>
-              <form onsubmit="handleSupport(event)" id="supportForm">
-                <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Issue Type</label>
-                  <select required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500">
-                    <option value="">Select issue type</option>
-                    <option value="payment">Payment Issue</option>
-                    <option value="task">Task Related</option>
-                    <option value="account">Account Problem</option>
-                    <option value="technical">Technical Issue</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-                
-                <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-                  <input type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="Brief description">
-                </div>
-                
-                <div class="mb-6">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Message</label>
-                  <textarea required rows="6" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="Describe your issue in detail..."></textarea>
-                </div>
-                
-                <button type="submit" class="w-full py-4 gradient-bg text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105">
-                  <i class="fas fa-paper-plane mr-2"></i>
-                  Send Message
-                </button>
-              </form>
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <h2 class="section-title">Why Choose TaskMaster Pro?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>High Earnings</h3>
+                <p>Earn up to $100 per task. Complete multiple tasks daily and maximize your income.</p>
             </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>Instant Payments</h3>
+                <p>Get paid instantly via PayPal, Bank Transfer, or Cryptocurrency.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Easy Tasks</h3>
+                <p>No special skills required. Simple tasks that anyone can complete.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>Secure Platform</h3>
+                <p>Your data and earnings are safe with our secure payment system.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>Mobile Friendly</h3>
+                <p>Work from anywhere using your smartphone or tablet.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌍</div>
+                <h3>Global Community</h3>
+                <p>Join a community of workers from around the world.</p>
+            </div>
+        </div>
+    </section>
 
-            <!-- Quick Links -->
-            <div class="bg-white rounded-2xl shadow-md p-6">
-              <h3 class="font-bold text-lg mb-4">Quick Links</h3>
-              <div class="space-y-3">
-                <a href="https://chat.whatsapp.com/BB9RnEv8b5E9AuOafdAac6?mode=gi_t" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-4 rounded-xl bg-green-50 hover:bg-green-100 transition">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                      <i class="fab fa-whatsapp text-green-600 text-xl"></i>
+    <!-- Categories Section -->
+    <section id="categories" class="categories">
+        <h2 class="section-title">Popular Task Categories</h2>
+        <div class="categories-grid">
+            <div class="category-card">
+                <div class="category-icon">📊</div>
+                <h3>Data Entry</h3>
+                <p>Simple data entry and form filling</p>
+                <div class="category-price">$5-$20</div>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">✍️</div>
+                <h3>Content Writing</h3>
+                <p>Write articles and reviews</p>
+                <div class="category-price">$10-$50</div>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">🧪</div>
+                <h3>Testing</h3>
+                <p>Test websites and apps</p>
+                <div class="category-price">$15-$30</div>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">📝</div>
+                <h3>Surveys</h3>
+                <p>Complete market research</p>
+                <div class="category-price">$2-$10</div>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">🎨</div>
+                <h3>Design</h3>
+                <p>Create simple graphics</p>
+                <div class="category-price">$20-$100</div>
+            </div>
+            <div class="category-card">
+                <div class="category-icon">📱</div>
+                <h3>Social Media</h3>
+                <p>Like, share, and comment</p>
+                <div class="category-price">$1-$5</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="testimonials">
+        <h2 class="section-title">What Our Users Say</h2>
+        <div class="testimonials-grid">
+            <div class="testimonial-card">
+                <p class="testimonial-text">"I've earned over $1000 in my first month! The tasks are easy and payments are always on time."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">JD</div>
+                    <div>
+                        <strong>John Doe</strong>
+                        <p style="color: var(--gray);">Top Earner</p>
                     </div>
-                    <span class="font-medium">Join WhatsApp Community</span>
-                  </div>
-                  <i class="fas fa-external-link-alt text-gray-400"></i>
-                </a>
-              </div>
+                </div>
             </div>
-          </div>
+            <div class="testimonial-card">
+                <p class="testimonial-text">"Great platform for making extra income. The support team is very helpful and responsive."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">JS</div>
+                    <div>
+                        <strong>Jane Smith</strong>
+                        <p style="color: var(--gray);">Premium User</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <p class="testimonial-text">"I love the variety of tasks available. There's always something interesting to work on."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">MB</div>
+                    <div>
+                        <strong>Mike Brown</strong>
+                        <p style="color: var(--gray);">Active Member</p>
+                    </div>
+                </div>
+            </div>
         </div>
-      `;
-      document.getElementById('mainContent').innerHTML = content;
-    }
+    </section>
 
-    async function handleSupport(e) {
-      e.preventDefault();
-      const form = e.target;
-      
-      const supportData = {
-        issueType: form[0].value,
-        subject: form[1].value,
-        message: form[2].value,
-        userEmail: userData.email,
-        submittedAt: new Date().toLocaleString()
-      };
-      
-      await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          access_key: '4d568274-521b-452a-a113-62eed5ad915b',
-          subject: `Support Request - ${supportData.issueType} - Creativepay`,
-          ...supportData
-        })
-      });
-      
-      showToast('Support request sent! We\'ll respond within 24 hours.');
-      setTimeout(() => showDashboard(), 1500);
-    }
+    <!-- CTA Section -->
+    <section class="cta">
+        <h2>Ready to Start Earning?</h2>
+        <p>Join TaskMaster Pro today and begin your journey to financial freedom.</p>
+        <a href="register.html" class="btn btn-primary btn-lg pulse">Create Free Account</a>
+    </section>
 
-    function showRefund() {
-      currentPage = 'refund';
-      const content = `
-        <div class="min-h-screen pb-20">
-          <!-- Header -->
-          <header class="gradient-bg px-6 py-6">
-            <div class="flex items-center gap-4">
-              <button onclick="showDashboard()" class="w-10 h-10 bg-white bg-opacity-20 rounded-xl flex items-center justify-center text-white">
-                <i class="fas fa-arrow-left"></i>
-              </button>
-              <div>
-                <h1 class="text-white text-2xl font-bold">Request Refund</h1>
-                <p class="text-white text-opacity-80">Submit refund request</p>
-              </div>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>TaskMaster Pro</h3>
+                <p>Your trusted platform for earning money online through simple tasks.</p>
             </div>
-          </header>
-
-          <!-- Refund Form -->
-          <div class="px-6 py-6">
-            <div class="bg-white rounded-2xl shadow-lg p-6">
-              <div class="bg-red-50 p-4 rounded-xl mb-6 border-l-4 border-red-500">
-                <div class="flex items-start gap-3">
-                  <i class="fas fa-exclamation-triangle text-red-600 text-xl mt-1"></i>
-                  <div>
-                    <h4 class="font-bold text-gray-800 mb-1">Refund Policy</h4>
-                    <p class="text-sm text-gray-700">Refunds are processed within 7-14 business days after approval</p>
-                  </div>
-                </div>
-              </div>
-
-              <form onsubmit="handleRefund(event)" id="refundForm">
-                <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Reason for Refund</label>
-                  <select required class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500">
-                    <option value="">Select reason</option>
-                    <option value="task_issue">Task Related Issue</option>
-                    <option value="payment_error">Payment Error</option>
-                    <option value="service_issue">Service Quality Issue</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-                
-                <div class="mb-4">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Transaction ID (if applicable)</label>
-                  <input type="text" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="Optional">
-                </div>
-                
-                <div class="mb-6">
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Detailed Explanation</label>
-                  <textarea required rows="6" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-purple-500" placeholder="Explain why you're requesting a refund..."></textarea>
-                </div>
-                
-                <button type="submit" class="w-full py-4 gradient-bg text-white rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition transform hover:scale-105">
-                  <i class="fas fa-paper-plane mr-2"></i>
-                  Submit Refund Request
-                </button>
-              </form>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#features">Features</a>
+                <a href="#categories">Categories</a>
+                <a href="#testimonials">Testimonials</a>
+                <a href="login.html">Login</a>
+                <a href="register.html">Sign Up</a>
             </div>
-          </div>
+            <div class="footer-section">
+                <h3>Support</h3>
+                <a href="#">FAQ</a>
+                <a href="#">Contact Us</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>Email: support@taskmasterpro.com</p>
+                <p>Phone: +1 (888) 123-4567</p>
+            </div>
         </div>
-      `;
-      document.getElementById('mainContent').innerHTML = content;
-    }
+        <div class="copyright">
+            &copy; 2024 TaskMaster Pro. All rights reserved.
+        </div>
+    </footer>
 
-    async function handleRefund(e) {
-      e.preventDefault();
-      const form = e.target;
-      
-      const refundData = {
-        reason: form[0].value,
-        transactionId: form[1].value,
-        explanation: form[2].value,
-        userEmail: userData.email,
-        submittedAt: new Date().toLocaleString()
-      };
-      
-      await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          access_key: '4d568274-521b-452a-a113-62eed5ad915b',
-          subject: 'Refund Request - Creativepay',
-          ...refundData
-        })
-      });
-      
-      showToast('Refund request submitted! Processing within 7-14 days.');
-      setTimeout(() => showDashboard(), 1500);
-    }
-
-    function toggleMenu() {
-      document.getElementById('slideMenu').classList.toggle('active');
-      document.getElementById('overlay').classList.toggle('active');
-      
-      if (userData.email) {
-        document.getElementById('menuUserEmail').textContent = userData.email;
-      }
-    }
-
-    function logout() {
-      if (confirm('Are you sure you want to logout?')) {
-        showToast('Logged out successfully');
-        setTimeout(() => showLanding(), 1000);
-      }
-    }
-
-    function showToast(message, type = 'success') {
-      const toast = document.getElementById('toast');
-      const toastMessage = document.getElementById('toastMessage');
-      
-      toastMessage.textContent = message;
-      toast.style.background = type === 'success' ? '#10b981' : '#ef4444';
-      toast.classList.add('active');
-      
-      setTimeout(() => {
-        toast.classList.remove('active');
-      }, 3000);
-    }
-
-    // Close overlay on click
-    document.getElementById('overlay').addEventListener('click', function() {
-      toggleMenu();
-    });
-
-    // Initialize app
-    init();
-  </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9c56485bf7abeff1',t:'MTc2OTY2NDA1MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+    <script type="module">
+        import { onAuthStateChanged, auth } from './js/firebase-config.js';
+        
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Update navbar for logged in users
+                const navLinks = document.querySelector('.nav-links');
+                if (navLinks) {
+                    navLinks.innerHTML = `
+                        <a href="dashboard.html">Dashboard</a>
+                        <a href="tasks.html">Tasks</a>
+                        <a href="profile.html" class="btn btn-outline btn-sm">Profile</a>
+                        <button onclick="window.location.href='logout.html'" class="btn btn-danger btn-sm">Logout</button>
+                    `;
+                }
+            }
+        });
+    </script>
+</body>
 </html>

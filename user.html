@@ -1,0 +1,58 @@
+<h2>User Dashboard</h2>
+
+<h3>Available Tasks</h3>
+<div id="tasks"></div>
+
+<h3>My Submissions</h3>
+<div id="mySubs"></div>
+
+<script type="module">
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged } from "firebase/auth";
+import {
+  getDocs, addDoc, collection, query, where, serverTimestamp
+} from "firebase/firestore";
+
+let uid;
+
+onAuthStateChanged(auth, user => {
+  if (!user) location.href = "index.html";
+  uid = user.uid;
+  loadTasks();
+  loadMySubs();
+});
+
+async function loadTasks() {
+  const snap = await getDocs(collection(db, "admin_tasks"));
+  tasks.innerHTML = "";
+  snap.forEach(d => {
+    const t = d.data();
+    tasks.innerHTML += `
+      <p>${t.title}<br>
+      <textarea id="ans-${d.id}"></textarea>
+      <button onclick="submit('${d.id}',${t.reward})">Submit</button></p>`;
+  });
+}
+
+window.submit = async (taskId, reward) => {
+  await addDoc(collection(db, "task_submissions"), {
+    taskId,
+    userId: uid,
+    content: document.getElementById(`ans-${taskId}`).value,
+    reward,
+    status: "pending",
+    submittedAt: serverTimestamp()
+  });
+  alert("Submitted");
+};
+
+async function loadMySubs() {
+  const q = query(collection(db, "task_submissions"), where("userId", "==", uid));
+  const snap = await getDocs(q);
+  mySubs.innerHTML = "";
+  snap.forEach(d => {
+    const s = d.data();
+    mySubs.innerHTML += `<p>${s.content} – ${s.status}</p>`;
+  });
+}
+</script>

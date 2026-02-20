@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - TaskMaster Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .register-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: var(--gradient);
+        }
+
+        .register-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .register-header h2 {
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .register-header p {
+            color: var(--gray);
+        }
+
+        .terms {
+            margin: 20px 0;
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .terms a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--gray);
+        }
+
+        .login-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .verification-pending {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .verification-pending .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        .verification-pending h3 {
+            color: var(--warning);
+            margin-bottom: 15px;
+        }
+
+        .verification-pending p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+
+        .countdown {
+            color: var(--primary);
+            font-weight: 600;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="toastContainer" class="toast-container"></div>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="register-container">
+        <div class="register-card">
+            <!-- Registration Form -->
+            <div id="registerForm">
+                <div class="register-header">
+                    <h2>Create Account</h2>
+                    <p>Join TaskMaster Pro and start earning</p>
+                </div>
+
+                <form onsubmit="event.preventDefault(); registerWithEmail();">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="fullName" placeholder="Enter your full name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="email" placeholder="Enter your email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="password" placeholder="Create a password (min. 6 characters)" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Admin Code (Optional)</label>
+                        <input type="text" id="adminCode" placeholder="Enter admin code if applicable">
+                        <small style="color: var(--gray);">Leave blank for regular user</small>
+                    </div>
+
+                    <div class="terms">
+                        By creating an account, you agree to our 
+                        <a href="#">Terms of Service</a> and 
+                        <a href="#">Privacy Policy</a>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;" id="registerBtn">
+                        Create Account
+                    </button>
+                </form>
+
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+
+                <button class="btn btn-secondary" style="width: 100%;" onclick="loginWithGoogle()" id="googleBtn">
+                    Continue with Google
+                </button>
+
+                <div class="login-link">
+                    Already have an account? <a href="login.html">Login here</a>
+                </div>
+            </div>
+
+            <!-- Verification Pending -->
+            <div id="verificationPending" class="verification-pending">
+                <div class="icon">📧</div>
+                <h3>Verify Your Email</h3>
+                <p>We've sent a verification link to <strong id="userEmail"></strong></p>
+                <p>Please check your inbox and click the link to verify your account.</p>
+                <p style="font-size: 14px;">Didn't receive the email? Check your spam folder or click below to resend.</p>
+                <button class="btn btn-warning" onclick="resendVerification()" id="resendBtn">Resend Email</button>
+                <div id="countdown" class="countdown"></div>
+                <p style="margin-top: 20px;">
+                    <a href="login.html" style="color: var(--primary);">Back to Login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { 
+            auth,
+            createUserWithEmailAndPassword,
+            signInWithPopup,
+            googleProvider,
+            updateProfile,
+            sendEmailVerification,
+            fetchSignInMethodsForEmail,
+            signOut,
+            saveUserToFirestore,
+            showToast,
+            showLoading,
+            setDoc,
+            doc,
+            db
+        } from './js/firebase-config.js';
+
+        let countdownInterval = null;
+        let currentEmail = '';
+
+        // Start countdown
+        function startCountdown(seconds = 60) {
+            const countdown = document.getElementById('countdown');
+            const resendBtn = document.getElementById('resendBtn');
+            
+            if (countdownInterval) clearInterval(countdownInterval);
+            
+            resendBtn.disabled = true;
+            
+            countdownInterval = setInterval(() => {
+                if (seconds <= 0) {
+                    clearInterval(countdownInterval);
+                    resendBtn.disabled = false;
+                    countdown.textContent = 'You can now resend the verification email.';
+                } else {
+                    countdown.textContent = `Resend available in ${seconds} seconds...`;
+                    seconds--;
+                }
+            }, 1000);
+        }
+
+        // Register with email
+        window.registerWithEmail = async function() {
+            const name = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const adminCode = document.getElementById('adminCode').value.trim();
+
+            // Validation
+            if (!name || !email || !password || !confirmPassword) {
+                showToast('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showToast('Passwords do not match', 'error');
+                return;
+            }
+
+            showLoading(true);
+            document.getElementById('registerBtn').disabled = true;
+
+            try {
+                // Check if email exists
+                const methods = await fetchSignInMethodsForEmail(auth, email);
+                if (methods.length > 0) {
+                    showToast('Email already registered. Please login instead.', 'error');
+                    return;
+                }
+
+                // Create user
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Update profile
+                await updateProfile(user, { displayName: name });
+
+                // Check if admin
+                const ADMIN_CODES = ['ADMIN123', 'SUPERADMIN2024'];
+                const isAdmin = ADMIN_CODES.includes(adminCode) || email === 'wanyoike755@gmail.com';
+
+                // Save to Firestore
+                await setDoc(doc(db, 'users', user.uid), {
+                    uid: user.uid,
+                    displayName: name,
+                    email: email,
+                    emailVerified: false,
+                    createdAt: new Date().toISOString(),
+                    lastLogin: new Date().toISOString(),
+                    balance: 0,
+                    totalEarnings: 0,
+                    tasksCompleted: 0,
+                    isAdmin: isAdmin,
+                    role: isAdmin ? 'admin' : 'user'
+                });
+
+                // Send verification
+                await sendEmailVerification(user);
+
+                // Store email
+                currentEmail = email;
+                document.getElementById('userEmail').textContent = email;
+
+                // Sign out
+                await signOut(auth);
+
+                // Show verification screen
+                document.getElementById('registerForm').style.display = 'none';
+                document.getElementById('verificationPending').style.display = 'block';
+
+                showToast('Registration successful! Please verify your email.', 'success');
+                startCountdown(60);
+
+            } catch (error) {
+                console.error('Registration error:', error);
+                showToast(error.message, 'error');
+            } finally {
+                showLoading(false);
+                document.getElementById('registerBtn').disabled = false;
+            }
+        };
+
+        // Login with Google
+        window.loginWithGoogle = async function() {
+            showLoading(true);
+            document.getElementById('googleBtn').disabled = true;
+
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
+                
+                // Save to Firestore
+                await saveUserToFirestore(user);
+
+                showToast('Google login successful!', 'success');
+                
+                setTimeout(() => {
+                    if (user.email === 'wanyoike755@gmail.com') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
+                }, 1500);
+
+            } catch (error) {
+                console.error('Google login error:', error);
+                showToast(error.message, 'error');
+            } finally {
+                showLoading(false);
+                document.getElementById('googleBtn').disabled = false;
+            }
+        };
+
+        // Resend verification
+        window.resendVerification = async function() {
+            showLoading(true);
+            document.getElementById('resendBtn').disabled = true;
+
+            try {
+                showToast('Verification email sent! Please check your inbox.', 'success');
+                startCountdown(60);
+            } catch (error) {
+                showToast('Error sending verification email', 'error');
+            } finally {
+                showLoading(false);
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdrawals - TaskMaster Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .withdrawals-container {
+            margin-top: 80px;
+            padding: 30px 5%;
+        }
+
+        .withdrawal-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .balance-info {
+            text-align: center;
+            padding: 30px;
+            background: var(--gradient);
+            color: white;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .balance-info .amount {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .method-card {
+            border: 2px solid var(--light);
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .method-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .method-card.selected {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .method-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .method-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .method-limit {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-amount {
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: var(--gray);
+        }
+    </style>
+</head>
+<body>
+    <div id="toastContainer" class="toast-container"></div>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">TaskMaster Pro</a>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="withdrawals.html">Withdrawals</a>
+            <div class="user-menu">
+                <span class="balance" id="balance">$0.00</span>
+                <div class="user-avatar" id="userAvatar">U</div>
+                <span id="userName">User</span>
+                <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="withdrawals-container">
+        <!-- Balance Info -->
+        <div class="balance-info">
+            <h3>Available Balance</h3>
+            <div class="amount" id="availableBalance">$0.00</div>
+            <p>Minimum withdrawal: $10.00</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+            <!-- Withdrawal Form -->
+            <div class="withdrawal-card">
+                <h3 style="margin-bottom: 20px;">Request Withdrawal</h3>
+                
+                <div class="form-group">
+                    <label>Amount ($)</label>
+                    <input type="number" id="withdrawAmount" min="10" step="0.01" placeholder="Enter amount">
+                </div>
+
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+                        <div class="method-card" onclick="selectMethod('paypal')" id="methodPaypal">
+                            <div class="method-icon">💰</div>
+                            <div class="method-name">PayPal</div>
+                            <div class="method-limit">Min: $10</div>
+                        </div>
+                        <div class="method-card" onclick="selectMethod('bank')" id="methodBank">
+                            <div class="method-icon">🏦</div>
+                            <div class="method-name">Bank Transfer</div>
+                            <div class="method-limit">Min: $20</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group" id="accountDetailsGroup" style="display: none;">
+                    <label>Account Details</label>
+                    <textarea id="accountDetails" rows="3" placeholder="Enter your account details"></textarea>
+                </div>
+
+                <button class="btn btn-success" style="width: 100%;" onclick="requestWithdrawal()" id="withdrawBtn">
+                    Request Withdrawal
+                </button>
+            </div>
+
+            <!-- Withdrawal History -->
+            <div class="withdrawal-card">
+                <h3 style="margin-bottom: 20px;">Withdrawal History</h3>
+                <div id="withdrawalHistory">
+                    <!-- History will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { 
+            auth,
+            db,
+            signOut,
+            onAuthStateChanged,
+            collection,
+            query,
+            where,
+            orderBy,
+            onSnapshot,
+            addDoc,
+            getDoc,
+            doc,
+            showToast,
+            showLoading
+        } from './js/firebase-config.js';
+
+        let currentUser = null;
+        let selectedMethod = null;
+
+        // Logout
+        window.logout = async function() {
+            showLoading(true);
+            try {
+                await signOut(auth);
+                window.location.href = 'index.html';
+            } catch (error) {
+                showToast('Error logging out', 'error');
+            } finally {
+                showLoading(false);
+            }
+        };
+
+        // Select payment method
+        window.selectMethod = function(method) {
+            selectedMethod = method;
+            
+            // Update UI
+            document.querySelectorAll('.method-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById(`method${method.charAt(0).toUpperCase() + method.slice(1)}`).classList.add('selected');
+            
+            // Show account details field
+            document.getElementById('accountDetailsGroup').style.display = 'block';
+            
+            // Update placeholder based on method
+            const detailsField = document.getElementById('accountDetails');
+            if (method === 'paypal') {
+                detailsField.placeholder = 'Enter your PayPal email address';
+            } else {
+                detailsField.placeholder = 'Enter your bank account details (Account name, number, routing number, etc.)';
+            }
+        };
+
+        // Request withdrawal
+        window.requestWithdrawal = async function() {
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const details = document.getElementById('accountDetails').value.trim();
+
+            if (!selectedMethod) {
+                showToast('Please select a payment method', 'error');
+                return;
+            }
+
+            if (!amount || amount < 10) {
+                showToast('Minimum withdrawal amount is $10', 'error');
+                return;
+            }
+
+            if (!details) {
+                showToast('Please enter your account details', 'error');
+                return;
+            }
+
+            // Check balance
+            const userRef = doc(db, 'users', currentUser.uid);
+            const userSnap = await getDoc(userRef);
+            const balance = userSnap.data().balance || 0;
+
+            if (amount > balance) {
+                showToast('Insufficient balance', 'error');
+                return;
+            }
+
+            showLoading(true);
+            document.getElementById('withdrawBtn').disabled = true;
+
+            try {
+                // Create withdrawal request
+                await addDoc(collection(db, 'withdrawals'), {
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName,
+                    amount: amount,
+                    method: selectedMethod,
+                    accountDetails: details,
+                    status: 'pending',
+                    requestedAt: new Date().toISOString()
+                });
+
+                // Deduct from balance
+                // Note: In production, you might want to hold the amount instead of deducting immediately
+                // await updateDoc(userRef, { balance: balance - amount });
+
+                showToast('Withdrawal request submitted successfully!', 'success');
+                
+                // Clear form
+                document.getElementById('withdrawAmount').value = '';
+                document.getElementById('accountDetails').value = '';
+                document.querySelectorAll('.method-card').forEach(card => card.classList.remove('selected'));
+                document.getElementById('accountDetailsGroup').style.display = 'none';
+                selectedMethod = null;
+
+            } catch (error) {
+                console.error('Withdrawal error:', error);
+                showToast('Error requesting withdrawal', 'error');
+            } finally {
+                showLoading(false);
+                document.getElementById('withdrawBtn').disabled = false;
+            }
+        };
+
+        // Load withdrawal history
+        function loadWithdrawalHistory() {
+            const historyDiv = document.getElementById('withdrawalHistory');
+            
+            const q = query(
+                collection(db, 'withdrawals'),
+                where('userId', '==', currentUser.uid),
+                orderBy('requestedAt', 'desc')
+            );
+            
+            onSnapshot(q, (snapshot) => {
+                if (snapshot.empty) {
+                    historyDiv.innerHTML = '<p style="text-align: center; color: var(--gray);">No withdrawal history</p>';
+                    return;
+                }
+
+                historyDiv.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const w = doc.data();
+                    historyDiv.innerHTML += `
+                        <div class="history-item">
+                            <div>
+                                <div class="history-amount">$${w.amount}</div>
+                                <div class="history-method">${w.method}</div>
+                                <div class="history-date">${new Date(w.requestedAt).toLocaleDateString()}</div>
+                            </div>
+                            <div>
+                                <span class="badge badge-${w.status}">${w.status}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+        }
+
+        // Load user balance
+        async function loadUserBalance() {
+            const userRef = doc(db, 'users', currentUser.uid);
+            const userSnap = await getDoc(userRef);
+            
+            if (userSnap.exists()) {
+                const balance = userSnap.data().balance || 0;
+                document.getElementById('balance').textContent = `$${balance.toFixed(2)}`;
+                document.getElementById('availableBalance').textContent = `$${balance.toFixed(2)}`;
+            }
+        }
+
+        // Check authentication
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.emailVerified) {
+                currentUser = user;
+                loadUserBalance();
+                loadWithdrawalHistory();
+                
+                // Update user info
+                document.getElementById('userName').textContent = user.displayName || 'User';
+                document.getElementById('userAvatar').textContent = (user.displayName || 'U').charAt(0).toUpperCase();
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>

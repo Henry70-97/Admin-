@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - TaskMaster Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: var(--gradient);
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.5s ease;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h2 {
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: var(--gray);
+        }
+
+        .social-login {
+            margin-top: 20px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--light);
+        }
+
+        .divider span {
+            padding: 0 10px;
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .forgot-password a {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--gray);
+        }
+
+        .register-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div id="toastContainer" class="toast-container"></div>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h2>Welcome Back!</h2>
+                <p>Login to access your account</p>
+            </div>
+
+            <form id="loginForm" onsubmit="event.preventDefault(); loginWithEmail();">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+
+                <div class="forgot-password">
+                    <a href="#" onclick="forgotPassword()">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="loginBtn">
+                    <span>Login</span>
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>OR</span>
+            </div>
+
+            <button class="btn btn-secondary" style="width: 100%;" onclick="loginWithGoogle()" id="googleBtn">
+                <span>Continue with Google</span>
+            </button>
+
+            <div class="register-link">
+                Don't have an account? <a href="register.html">Sign up here</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { 
+            auth,
+            signInWithEmailAndPassword,
+            signInWithPopup,
+            googleProvider,
+            sendEmailVerification,
+            signOut,
+            saveUserToFirestore,
+            showToast,
+            showLoading,
+            doc,
+            getDoc,
+            db
+        } from './js/firebase-config.js';
+
+        // Login with email
+        window.loginWithEmail = async function() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                showToast('Please fill in all fields', 'error');
+                return;
+            }
+
+            showLoading(true);
+            document.getElementById('loginBtn').disabled = true;
+
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                
+                // Check if email is verified
+                if (!user.emailVerified) {
+                    await sendEmailVerification(user);
+                    await signOut(auth);
+                    showToast('Please verify your email. A new verification link has been sent.', 'warning');
+                    return;
+                }
+
+                // Save/update user in Firestore
+                await saveUserToFirestore(user);
+
+                showToast('Login successful! Redirecting...', 'success');
+                
+                // Check if admin
+                setTimeout(() => {
+                    if (user.email === 'wanyoike755@gmail.com') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
+                }, 1500);
+
+            } catch (error) {
+                console.error('Login error:', error);
+                let message = 'Login failed';
+                
+                if (error.code === 'auth/user-not-found') {
+                    message = 'No account found with this email';
+                } else if (error.code === 'auth/wrong-password') {
+                    message = 'Incorrect password';
+                } else if (error.code === 'auth/invalid-email') {
+                    message = 'Invalid email address';
+                } else if (error.code === 'auth/too-many-requests') {
+                    message = 'Too many failed attempts. Please try again later.';
+                }
+                
+                showToast(message, 'error');
+            } finally {
+                showLoading(false);
+                document.getElementById('loginBtn').disabled = false;
+            }
+        };
+
+        // Login with Google
+        window.loginWithGoogle = async function() {
+            showLoading(true);
+            document.getElementById('googleBtn').disabled = true;
+
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
+                
+                // Save/update user in Firestore
+                await saveUserToFirestore(user);
+
+                showToast('Google login successful!', 'success');
+                
+                setTimeout(() => {
+                    if (user.email === 'wanyoike755@gmail.com') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
+                }, 1500);
+
+            } catch (error) {
+                console.error('Google login error:', error);
+                let message = 'Google login failed';
+                
+                if (error.code === 'auth/popup-closed-by-user') {
+                    message = 'Sign-in popup was closed';
+                } else if (error.code === 'auth/popup-blocked') {
+                    message = 'Pop-up was blocked. Please allow pop-ups.';
+                }
+                
+                showToast(message, 'error');
+            } finally {
+                showLoading(false);
+                document.getElementById('googleBtn').disabled = false;
+            }
+        };
+
+        // Forgot password
+        window.forgotPassword = function() {
+            const email = document.getElementById('email').value.trim();
+            if (email) {
+                showToast(`Password reset link sent to ${email}`, 'success');
+            } else {
+                showToast('Please enter your email address', 'warning');
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Tasks - TaskMaster Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .tasks-container {
+            margin-top: 80px;
+            padding: 30px 5%;
+        }
+
+        .filters-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .submit-modal {
+            max-width: 600px;
+        }
+
+        .submission-preview {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="toastContainer" class="toast-container"></div>
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="index.html" class="logo">TaskMaster Pro</a>
+        <div class="nav-links">
+            <a href="dashboard.html">Dashboard</a>
+            <a href="tasks.html">Tasks</a>
+            <a href="withdrawals.html">Withdrawals</a>
+            <div class="user-menu">
+                <span class="balance" id="balance">$0.00</span>
+                <div class="user-avatar" id="userAvatar">U</div>
+                <span id="userName">User</span>
+                <button class="btn btn-danger btn-sm" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="tasks-container">
+        <!-- Filters -->
+        <div class="filters-section">
+            <h3 style="margin-bottom: 20px;">🔍 Filter Tasks</h3>
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label>Category</label>
+                    <select id="categoryFilter" onchange="filterTasks()">
+                        <option value="all">All Categories</option>
+                        <option value="Data Entry">📊 Data Entry</option>
+                        <option value="Content Writing">✍️ Content Writing</option>
+                        <option value="Testing">🧪 Testing</option>
+                        <option value="Surveys">📝 Surveys</option>
+                        <option value="Design">🎨 Design</option>
+                        <option value="Social Media">📱 Social Media</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Sort By</label>
+                    <select id="sortFilter" onchange="filterTasks()">
+                        <option value="newest">Newest First</option>
+                        <option value="price-high">Highest Price</option>
+                        <option value="price-low">Lowest Price</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Price Range</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" id="minPrice" placeholder="Min" onchange="filterTasks()">
+                        <input type="number" id="maxPrice" placeholder="Max" onchange="filterTasks()">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasks Grid -->
+        <h2 class="section-title">Available Tasks</h2>
+        <div class="tasks-grid" id="tasksList">
+            <!-- Tasks will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Submit Task Modal -->
+    <div id="submitModal" class="modal">
+        <div class="modal-content submit-modal">
+            <div class="modal-header">
+                <h2>📤 Submit Task</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="taskPreview" class="submission-preview"></div>
+                
+                <div class="form-group">
+                    <label>Your Work</label>
+                    <textarea id="submissionWork" rows="5" placeholder="Describe your work, provide links, or upload files..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Additional Notes</label>
+                    <textarea id="submissionNotes" rows="3" placeholder="Any additional information for the reviewer..."></textarea>
+                </div>
+                
+                <button class="btn btn-success" style="width: 100%;" onclick="submitTask()" id="submitBtn">
+                    Submit Task
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { 
+            auth,
+            db,
+            signOut,
+            onAuthStateChanged,
+            collection,
+            query,
+            where,
+            orderBy,
+            onSnapshot,
+            addDoc,
+            getDoc,
+            doc,
+            showToast,
+            showLoading
+        } from './js/firebase-config.js';
+
+        let currentUser = null;
+        let currentTaskId = null;
+        let allTasks = [];
+
+        // Logout
+        window.logout = async function() {
+            showLoading(true);
+            try {
+                await signOut(auth);
+                window.location.href = 'index.html';
+            } catch (error) {
+                showToast('Error logging out', 'error');
+            } finally {
+                showLoading(false);
+            }
+        };
+
+        // Load tasks with real-time updates
+        function loadTasks() {
+            const tasksList = document.getElementById('tasksList');
+            
+            const q = query(
+                collection(db, 'tasks'),
+                where('status', '==', 'available'),
+                orderBy('createdAt', 'desc')
+            );
+            
+            onSnapshot(q, (snapshot) => {
+                allTasks = [];
+                snapshot.forEach(doc => {
+                    allTasks.push({ id: doc.id, ...doc.data() });
+                });
+                
+                filterTasks();
+            });
+        }
+
+        // Filter tasks
+        window.filterTasks = function() {
+            const category = document.getElementById('categoryFilter').value;
+            const sort = document.getElementById('sortFilter').value;
+            const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+            const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+
+            let filtered = [...allTasks];
+
+            // Apply category filter
+            if (category !== 'all') {
+                filtered = filtered.filter(task => task.category === category);
+            }
+
+            // Apply price filter
+            filtered = filtered.filter(task => task.price >= minPrice && task.price <= maxPrice);
+
+            // Apply sorting
+            if (sort === 'price-high') {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (sort === 'price-low') {
+                filtered.sort((a, b) => a.price - b.price);
+            } else {
+                filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            }
+
+            displayTasks(filtered);
+        };
+
+        // Display tasks
+        function displayTasks(tasks) {
+            const tasksList = document.getElementById('tasksList');
+            
+            if (tasks.length === 0) {
+                tasksList.innerHTML = '<div class="card" style="grid-column: 1/-1; text-align: center; padding: 50px;">No tasks match your filters</div>';
+                return;
+            }
+
+            tasksList.innerHTML = tasks.map(task => `
+                <div class="task-card">
+                    <div class="task-header">
+                        <span class="task-category">${task.category || 'General'}</span>
+                        <span class="task-price">$${task.price}</span>
+                    </div>
+                    <h3 class="task-title">${task.title}</h3>
+                    <p class="task-description">${task.description}</p>
+                    <div class="task-deadline">
+                        <span>📅 Deadline: ${task.deadline ? new Date(task.deadline).toLocaleDateString() : 'No deadline'}</span>
+                    </div>
+                    <div class="task-footer">
+                        <span class="badge badge-pending">Available</span>
+                        <button class="btn btn-primary btn-sm" onclick="openSubmitModal('${task.id}')">Submit Task</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Open submit modal
+        window.openSubmitModal = async function(taskId) {
+            currentTaskId = taskId;
+            
+            try {
+                const taskRef = doc(db, 'tasks', taskId);
+                const taskSnap = await getDoc(taskRef);
+                
+                if (taskSnap.exists()) {
+                    const task = taskSnap.data();
+                    document.getElementById('taskPreview').innerHTML = `
+                        <h4>${task.title}</h4>
+                        <p><strong>Reward:</strong> $${task.price}</p>
+                        <p><strong>Description:</strong> ${task.description}</p>
+                    `;
+                }
+                
+                document.getElementById('submitModal').classList.add('active');
+                
+            } catch (error) {
+                console.error('Error loading task:', error);
+                showToast('Error loading task details', 'error');
+            }
+        };
+
+        // Submit task
+        window.submitTask = async function() {
+            const work = document.getElementById('submissionWork').value.trim();
+            const notes = document.getElementById('submissionNotes').value.trim();
+
+            if (!work) {
+                showToast('Please describe your work', 'error');
+                return;
+            }
+
+            showLoading(true);
+            document.getElementById('submitBtn').disabled = true;
+
+            try {
+                // Get task details
+                const taskRef = doc(db, 'tasks', currentTaskId);
+                const taskSnap = await getDoc(taskRef);
+                const task = taskSnap.data();
+
+                // Create submission
+                await addDoc(collection(db, 'submissions'), {
+                    userId: currentUser.uid,
+                    userName: currentUser.displayName,
+                    taskId: currentTaskId,
+                    taskTitle: task.title,
+                    reward: task.price,
+                    work: work,
+                    notes: notes,
+                    status: 'pending',
+                    submittedAt: new Date().toISOString()
+                });
+
+                showToast('Task submitted successfully!', 'success');
+                closeModal();
+                
+                // Clear form
+                document.getElementById('submissionWork').value = '';
+                document.getElementById('submissionNotes').value = '';
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                showToast('Error submitting task', 'error');
+            } finally {
+                showLoading(false);
+                document.getElementById('submitBtn').disabled = false;
+            }
+        };
+
+        // Close modal
+        window.closeModal = function() {
+            document.getElementById('submitModal').classList.remove('active');
+        };
+
+        // Check authentication
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.emailVerified) {
+                currentUser = user;
+                loadTasks();
+                
+                // Update user info
+                document.getElementById('userName').textContent = user.displayName || 'User';
+                document.getElementById('userAvatar').textContent = (user.displayName || 'U').charAt(0).toUpperCase();
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>
